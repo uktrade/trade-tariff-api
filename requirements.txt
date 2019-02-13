@@ -1,0 +1,10 @@
+Click==7.0
+Flask==1.0.2
+itsdangerous==1.1.0
+Jinja2==2.10
+lxml==4.2.5
+MarkupSafe==1.1.0
+Werkzeug==0.14.1
+Boto3==1.9.62
+waitress==1.1.0
+IPy==0.83

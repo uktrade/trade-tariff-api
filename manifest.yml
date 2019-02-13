@@ -1,0 +1,5 @@
+---
+applications:
+- name: tariffs-api
+  memory: 1GB
+  buildpack: python_buildpack
