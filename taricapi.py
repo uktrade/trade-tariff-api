@@ -258,17 +258,20 @@ def update_index(seq):
 # ---------------------------------------------
 # index page - could be used for pings / checks
 # ---------------------------------------------
-@app.route("/")
-def hello():
+@app.route("/check")
+def check():
     print(request.headers)
     print(request.environ)
-    message = "Welcome from " + get_apikey(request) + " @ " + " ".join(get_remoteaddr(request))
+    message = "Request from " + get_apikey(request) + " @ " + " ".join(get_remoteaddr(request))
     return render_template('index.html', message = message)
 
 @app.route("/healthcheck")
 def healthcheck():
     return Response("OK", status = 200)
 
+@app.route("/")
+def hello():
+    return Response("", status = 404)
 
 # --------------------------------------------------------------------------------------------
 # API to retrieve list of delta files (for a date or defaults to yesterday to get latest file)
