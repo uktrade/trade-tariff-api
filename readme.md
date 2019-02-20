@@ -12,48 +12,62 @@ For example:
 
 **DATE**    | **FILE(S)**
 ---|---
-02-01-2019  | 190001
-03-01-2019  | 190002, 190003 
-04-01-2019  | 190004
-07-01-2019  | 190005
+2019-01-02  | 190001
+2019-01-03  | 190002, 190003 
+2019-01-04  | 190004
+2019-01-07  | 190005
 
 ## API endpoints
 
-### List files available by date
+### taricdeltas -- List files available by date
 
-**/api/v1/taricdeltas/{date}**
+**/api/v1/taricdeltas/**{date}
 
 {date} defaults to yesterday
 
-curl -i -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas
+{date} must be in YYYY-MM-DD format
+
+e.g.
+
+```
+curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas
+
+curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas/2018-12-01
+```
+### taricfiles -- Get specific file
+
+**/api/v1/taricfiles/**{sequenceid}
+
+{sequenceid} is a 6 digit number
+
+e.g.
+```
+curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricfiles/18004
+```
 
 
-curl -i -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas/2018-12-01
+### taricfiles - (Upload) Post specific file
 
-### Get specific file
+**/api/v1/taricfiles/**{sequenceid}
 
-**/api/v1/taricfiles/{sequenceid}**
+{sequenceid} is a 6 digit number
 
-curl -i -H "X-API-KEY: abc123" localhost:8080/api/v1/taricfiles/18004
+{file} as form element
 
-
-
-### Upload file
-
-POST method of the get specific file
-
-curl --form file=@/users/dave/downloads/Taric3_files/TGB18146.xml -H "X-API-KEY: def456" localhost:8080/api/v1/taricfiles/18003
-
+e.g.
+```
+curl --form file=@/users/dave/downloads/Taric3_files/TGB18146.xml -H "X-API-KEY: def456" localhost:8080/api/v1/taricfiles/18146
+```
 
 # Security mechanisms
 
-Api key in HTTP HEADER required for authentication.
+Api key (`X-API-KEY`) in HTTP request header is required for authentication.
 
 Api key for upload is separate.
 
-Access to the API endpoints is for whitelisted IP Addresses.
+Access to the API endpoints is for whitelisted IP addresses. IP address is identified from the request header and using the `X-Forwarded-For` header if available. 
 
-Uploads are permitted from separate list of IP addresses.
+Uploads are permitted from separate whitelist of IP addresses.
 
 
 # Installation
@@ -75,36 +89,39 @@ AWS_SECRET_ACCESS_KEY   | S3 Secret
 
 ** IP addresses can be a range such as 11.22.33.44/24
 
-*** Storage can be S3 or local - depends on the module used in the build - either **apifile.py** _or_ **apifiles3.py**
+*** Storage can be S3 or local - depends on the module used in the build / import - either **apifile.py** _or_ **apifiles3.py**
 
 
 
 ##  Local Installation
-###  virtualenv
-###  requirements.txt
+virtualenv is recommended
 
+```
+$ virtualenv taric-api
+$ source taric-api/bin/activate
+(taric-api) $ pip install -r requirements.txt
+```
 
 ##  Cloudfoundry Installation
-procfile and manifest are provided
+procfile and manifest.yml are provided
 
 Using the Cloudfoundry cli:
+```
+cf push APP-NAME --no-start
+cf set-env APP-NAME API_ROOT "https://APP-NAME.domain"
+...
+```
 
-cf push {app-name}
+# Testing
 
+The strategy is to use a Unix shell script and curl commands, compare the response codes.
 
-# Tests
+`tests/runtests.sh` checks API response codes against expected. Note that the http header X-Forwarded-For is inserted for local testing. This should be removed when testing via a proxy or in a cloud environment. 
 
-Basic test script uses curl and unix shell script.
+`tests/testserver.sh` is a sample script to start a server locally with environment variables.
 
-Script checks all the conditions and response codes.
-
-Sample environment variables provided.
-
+Note that test data setup and cleardown are not provided at this time.
+ 
 # Further detail
 
-Complete API specification is documented and available in the word document.
-
-
-
-
-
+The complete API specification is documented and available in a separate word document.

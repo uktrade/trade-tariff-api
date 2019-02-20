@@ -71,21 +71,18 @@ def find(list, key, value):
             return i
     return -1
 
-def file_exists (prefix, file):
+def file_exists(filename):
     try:
-        allobjects = session().list_objects(Bucket = AWS_BUCKET_NAME,
-                                            Prefix = prefix)
-        if 'Contents' in allobjects:
-            filelist = allobjects['Contents']
-            filename = find(filelist, 'Key', file)
+        response = session().get_object(Bucket = AWS_BUCKET_NAME,
+                                        Key = filename)
+        return True
 
-            return filename > -1
-        else:
-            return False
+    except session().exceptions.NoSuchKey:
+        return False
 
     except ClientError:
-        logger.error ("Error retrieving list of objects in AWS")
-        return False
+        logger.error("Error occurred in get_object for " + filename + " : " + ClientError)
+        return None
 
 def get_file(filepath):
     try:
@@ -204,13 +201,19 @@ def rename_file(fromname, toname):
 def rename_taric_file(seq, filetime):
     # AWS S3 has no rename - have to copy & delete
     logger.debug("Renaming temp file to " + get_taric_filepath(seq))
-    logger.debug("Setting Metadata modified to " + filetime)
 
-    session().copy_object (Bucket = AWS_BUCKET_NAME,
-                           CopySource = {'Bucket': AWS_BUCKET_NAME, 'Key': get_temp_taric_filepath(seq)},
-                           Key = get_taric_filepath(seq),
-                           Metadata = {'modified': filetime},
-                           MetadataDirective = 'REPLACE')
+    if filetime is not None:
+        logger.debug("Setting Metadata modified to " + filetime)
+        session().copy_object (Bucket = AWS_BUCKET_NAME,
+                               CopySource = {'Bucket': AWS_BUCKET_NAME, 'Key': get_temp_taric_filepath(seq)},
+                               Key = get_taric_filepath(seq),
+                               Metadata = {'modified': filetime},
+                               MetadataDirective = 'REPLACE')
+    else:
+        session().copy_object (Bucket = AWS_BUCKET_NAME,
+                               CopySource = {'Bucket': AWS_BUCKET_NAME, 'Key': get_temp_taric_filepath(seq)},
+                               Key = get_taric_filepath(seq),
+                               MetadataDirective = 'REPLACE')
 
     session().delete_object(Bucket = AWS_BUCKET_NAME,
                             Key = get_temp_taric_filepath(seq))

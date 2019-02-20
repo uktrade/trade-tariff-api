@@ -52,8 +52,6 @@ APIKEYS_UPLOAD = "" if env_apikeys_upload is None else env_apikeys_upload.split(
 WHITELIST = "" if env_whitelist is None else env_whitelist.split(",")
 WHITELIST_UPLOAD = "" if env_whitelist_upload is None else env_whitelist_upload.split(",")
 
-print(WHITELIST)
-
 # Define logging for debugging
 logger = logging.getLogger('taricapi')
 logger.setLevel(logging.DEBUG)
@@ -63,6 +61,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+logger.info(WHITELIST)
 
 # start file client module
 file_client(logger)
@@ -90,12 +89,16 @@ def get_remoteaddr(request):
         logger.info("Remote addresses are " + request.environ['HTTP_X_FORWARDED_FOR'])
         remoteaddrs = request.environ['HTTP_X_FORWARDED_FOR'].split(",")
 
+    if len(remoteaddrs) > 2:
+        logger.warn("Additional remote addresses stripped (possible spoofing)")
+        remoteaddrs = remoteaddrs[-2:]
+
     return remoteaddrs
 
 def in_whitelist(remoteaddrs):
     for addr in remoteaddrs:
         for wlip in WHITELIST:
-            print(addr + " " + wlip)
+            logger.debug(addr + " " + wlip)
             if addr in IP(wlip):
                 return True
     return False
@@ -103,7 +106,7 @@ def in_whitelist(remoteaddrs):
 def in_whitelist_upload(remoteaddrs):
     for addr in remoteaddrs:
         for wlip in WHITELIST_UPLOAD:
-            print(addr + " " + wlip)
+            logger.debug(addr + " " + wlip)
             if addr in IP(wlip):
                 return True
     return False
@@ -126,7 +129,7 @@ def in_apikeys_upload(apikey):
 def is_auth(request):
     apikey = get_apikey(request)
     remoteaddr = get_remoteaddr(request)
-    print(str(in_apikeys(apikey)) + " && " + str(in_whitelist(remoteaddr)))
+    logger.debug(str(in_apikeys(apikey)) + " && " + str(in_whitelist(remoteaddr)))
     return in_apikeys(apikey) and in_whitelist(remoteaddr)
 
 def is_auth_upload(request):
@@ -159,13 +162,19 @@ def is_schema_validated(xmlfile):
 
     xsd_doc = etree.parse("taric3.xsd")
     xsd = etree.XMLSchema(xsd_doc)
-    xml = etree.parse(io.BytesIO(read_file(xmlfile)))
+
+    try:
+        xml = etree.parse(io.BytesIO(read_file(xmlfile)))
+
+    except Exception:
+        logger.info("Unable to parse file as XML")
+        return False
 
     if not xsd.validate(xml):
-        logger.debug("XML Failed validation")
+        logger.info("XML Failed validation")
         logger.debug(xsd.error_log)
     else:
-        logger.debug("XML validates against taric3 schema")
+        logger.info("XML validates against taric3 schema")
 
     return xsd.validate(xml)
 
@@ -186,12 +195,12 @@ def create_index_entry(seq):
 # Rebuild master file index (JSON)
 # --------------------------------
 def rebuild_index(nocheck):
-    if not file_exists("", get_taric_index_file()) or nocheck:
+    if not file_exists(get_taric_index_file()) or nocheck:
         logger.info("*** Rebuilding file index... ***")
         all_deltas = []
 
         files = get_file_list(None)
-        print(files)
+        logger.info(files)
         for file in files:
             # build entry for file just uploaded
             # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
@@ -260,8 +269,8 @@ def update_index(seq):
 # ---------------------------------------------
 @app.route("/check")
 def check():
-    print(request.headers)
-    print(request.environ)
+    logger.info(request.headers)
+    logger.info(request.environ)
     message = "Request from " + get_apikey(request) + " @ " + " ".join(get_remoteaddr(request))
     return render_template('index.html', message = message)
 
@@ -325,6 +334,7 @@ def taricdeltas(date):
 # API to retrieve contents of specific file
 # -----------------------------------------
 @app.route('/api/v1/taricfiles/<seq>', methods = ['GET'])
+@app.route('/api/v1/taricfiles', defaults={'seq': ''}, methods = ['GET'])
 def taricfiles(seq):
 
     if not is_auth(request):
@@ -353,7 +363,10 @@ def taricfiles(seq):
 # File modification time can be set using ?modtime=yyyy-mm-ddThh:mm:ss
 # --------------------------------------------------------------------
 @app.route('/api/v1/taricfiles/<seq>', methods = ['POST'])
+@app.route('/api/v1/taricfiles', defaults={'seq': ''}, methods = ['POST'])
 def taricfiles_upload(seq):
+
+    modtime = None
 
     if not is_auth_upload(request):
         logger.info("API key not provided or not authorised")
@@ -378,11 +391,14 @@ def taricfiles_upload(seq):
 
     logger.debug("file uploaded is " + file.filename)
 
-    if not request.args.get('modtime') is None and not is_valid_datetime(request.args.get('modtime')):
-        logger.info("Invalid file modification timestamp specified " + request.args.get('modtime'))
-        return Response("400 Invalid file modification timestamp specified", status = 400)
+    if not request.args.get('modtime') is None:
+        if not is_valid_datetime(request.args.get('modtime')):
+            logger.info("Invalid file modification timestamp specified " + request.args.get('modtime'))
+            return Response("400 Invalid file modification timestamp specified", status = 400)
+        else:
+            modtime = request.args.get('modtime')
+            logger.debug("file mod time is " + modtime)
 
-    logger.debug("file mod time is " + request.args.get('modtime'))
 
     # Save the uploaded XML file as temporary
     temp_file_name = save_temp_taric_file(file, seq)
@@ -401,7 +417,7 @@ def taricfiles_upload(seq):
 
     # Rename the temporary XML file and update the index - used by the deltas API
     try:
-        rename_taric_file(seq, request.args.get('modtime'))
+        rename_taric_file(seq, modtime)
         update_index(seq)
     except IOError as exc:
         logger.error("Error saving file " + seq + ".xml " + str(exc))
