@@ -15,6 +15,7 @@ from apifiles3 import file_exists
 from apifiles3 import read_file
 from apifiles3 import get_file_size
 from apifiles3 import get_file_list
+from apifiles3 import get_taric_file_prefix
 from apifiles3 import get_taric_filepath
 from apifiles3 import get_taric_index_file
 from apifiles3 import read_taric_file
@@ -89,9 +90,15 @@ def get_remoteaddr(request):
         logger.info("Remote addresses are " + request.environ['HTTP_X_FORWARDED_FOR'])
         remoteaddrs = request.environ['HTTP_X_FORWARDED_FOR'].split(",")
 
-    if len(remoteaddrs) > 2:
-        logger.warn("Additional remote addresses stripped (possible spoofing)")
-        remoteaddrs = remoteaddrs[-2:]
+    request_host = request.environ['HTTP_HOST']
+    if "cloudapps.digital" in request_host:     # check for legacy URL
+        if len(remoteaddrs) > 2:                # if so only two IPs
+            logger.warn("Additional remote addresses stripped (possible spoofing)")
+            remoteaddrs = remoteaddrs[-2:]
+    else:
+        if len(remoteaddrs) > 3:                # additional IP for cloudfront
+            logger.warn("Additional remote addresses stripped (possible spoofing)")
+            remoteaddrs = remoteaddrs[-3:]
 
     return remoteaddrs
 
@@ -206,16 +213,17 @@ def rebuild_index(nocheck):
             # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
             # TODO - combine with individual update_index..
             f = file['Key']
-            f = f[f.rindex("/")+1:]                   # remove folder prefix
+            f = f[f.rindex("/")+1:]                         # remove folder prefix
             logger.info("Found file " + f)
 
             if f.startswith("TEMP_"):
                 logger.info("Removing temporary file " + f)
-                seq = f[5:-4]                       # remove TEMP_ file prefix and .xml extension
+                seq = f[5:-4]                               # remove TEMP_ file prefix and .xml extension
                 remove_temp_taric_file(seq)
             else:
-                if is_valid_seq(f[:-4]):            # ignore non taric files
-                    seq = f[:-4]                    # remove .xml extension
+                f = f.replace(get_taric_file_prefix(),"")   # remove taric file prefix
+                if is_valid_seq(f[:-4]):                    # ignore non taric files
+                    seq = f[:-4]                            # remove .xml extension
                     all_deltas.append(create_index_entry(seq))
 
         logger.debug(str(len(all_deltas)) + " delta files listed after update")

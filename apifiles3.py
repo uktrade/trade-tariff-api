@@ -9,6 +9,7 @@ from botocore.exceptions import ClientError
 
 TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
 TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
+TARIC_FILE_PREFIX = "DIT"
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
@@ -163,8 +164,11 @@ def md5(filepath):
 
 
 # Taric file specific functions
+def get_taric_file_prefix():
+    return TARIC_FILE_PREFIX
+
 def get_taric_filepath(seq):
-    return TARIC_FILES_FOLDER + "/" + seq + ".xml"
+    return TARIC_FILES_FOLDER + "/" + TARIC_FILE_PREFIX + seq + ".xml"
 
 def get_temp_taric_filepath(seq):
     return TARIC_FILES_FOLDER + "/TEMP_" + seq + ".xml"
