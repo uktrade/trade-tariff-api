@@ -1,19 +1,21 @@
-import signal
-import time
-
 from gevent import monkey
-from gevent.pywsgi import WSGIServer
 
 monkey.patch_all()
-import gevent
-import os
-import sys
-import io
-import re
-import json
-import logging
+
 import datetime
 import hashlib
+import io
+import json
+import logging
+import sys
+import signal
+import re
+
+from flask import Flask, render_template, make_response, request, Response
+import gevent
+from gevent.pywsgi import WSGIServer
+from lxml import etree
+from IPy import IP
 
 # Use apifile for file system, apifiles3 for AWS S3
 from config import API_ROOT, APIKEYS, APIKEYS_UPLOAD, WHITELIST, WHITELIST_UPLOAD, PORT
@@ -31,16 +33,6 @@ from apifiles3 import save_temp_taric_file
 from apifiles3 import rename_taric_file
 from apifiles3 import remove_temp_taric_file
 from apifiles3 import write_file
-
-from lxml import etree
-
-from IPy import IP
-
-from flask import Flask
-from flask import render_template
-from flask import make_response
-from flask import request
-from flask import Response
 
 
 app = Flask(__name__)
