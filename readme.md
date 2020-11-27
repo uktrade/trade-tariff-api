@@ -94,12 +94,12 @@ AWS_SECRET_ACCESS_KEY   | S3 Secret
 
 
 ##  Local Installation
-virtualenv is recommended
+Virtualenv is recommended. `pip-tools` is used to manage live and dev dependencies.
 
 ```
 $ virtualenv taric-api
 $ source taric-api/bin/activate
-(taric-api) $ pip install -r requirements.txt
+(taric-api) $ pip install -r requirements-dev.txt
 ```
 
 ##  Cloudfoundry Installation
@@ -110,6 +110,15 @@ Using the Cloudfoundry cli:
 cf push APP-NAME --no-start
 cf set-env APP-NAME API_ROOT "https://APP-NAME.domain"
 ...
+```
+
+## Updating dependencies
+
+Edit `requirements.in` or `requirements-dev.in` and run the following
+
+```
+$ pip-compile requirements.in
+$ pip-compile requirements-dev.in
 ```
 
 # Testing
