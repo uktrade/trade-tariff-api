@@ -7,14 +7,9 @@ from botocore.exceptions import ClientError
 from config import AWS_BUCKET_NAME, TARIC_FILES_FOLDER, TARIC_FILES_INDEX
 
 
-logger = logging.getLogger('taricapi-files3')
+logger = logging.getLogger('taricapi.files3')
 
 sid = None
-
-
-def file_client(plogger):
-    global logger
-    logger = plogger
 
 
 # AWS S3 session

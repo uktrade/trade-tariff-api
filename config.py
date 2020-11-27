@@ -16,3 +16,23 @@ WHITELIST_UPLOAD = os.environ.get("WHITELIST_UPLOAD", "").split(',')
 
 TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
 TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'ecs': {
+            '()': 'ecs_logging.StdlibFormatter',
+        }
+    },
+    'handlers': {
+        'wsgi': {
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://flask.logging.wsgi_errors_stream',
+            'formatter': 'ecs'
+        }
+    },
+    'root': {'level': 'INFO', 'handlers': ['wsgi']},
+    'taricapi': {'level': 'INFO', 'handlers': ['wsgi']},
+    'flask': {'level': 'INFO', 'handlers': ['wsgi']},
+}

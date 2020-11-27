@@ -11,11 +11,7 @@ from datetime import datetime
 TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
 TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
 
-logger = logging.getLogger('taricapi-file')
-
-def file_client(plogger):
-    global logger
-    logger = plogger
+logger = logging.getLogger('taricapi.file')
 
 
 # -------------------------------------------------

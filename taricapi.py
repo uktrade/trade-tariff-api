@@ -6,8 +6,7 @@ import datetime
 import hashlib
 import io
 import json
-import logging
-import sys
+from logging.config import dictConfig
 import signal
 import re
 
@@ -18,8 +17,7 @@ from lxml import etree
 from IPy import IP
 
 # Use apifile for file system, apifiles3 for AWS S3
-from config import API_ROOT, APIKEYS, APIKEYS_UPLOAD, WHITELIST, WHITELIST_UPLOAD, PORT
-from apifiles3 import file_client
+from config import API_ROOT, APIKEYS, APIKEYS_UPLOAD, WHITELIST, WHITELIST_UPLOAD, PORT, LOGGING
 from apifiles3 import modification_date
 from apifiles3 import md5
 from apifiles3 import file_exists
@@ -35,21 +33,10 @@ from apifiles3 import remove_temp_taric_file
 from apifiles3 import write_file
 
 
+dictConfig(LOGGING)
+
 app = Flask(__name__)
-
-# Define logging for debugging
 logger = app.logger
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-
-logger.info(WHITELIST)
-
-# start file client module
-file_client(logger)
 
 
 # -----------------------
