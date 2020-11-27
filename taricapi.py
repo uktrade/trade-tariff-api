@@ -26,7 +26,7 @@ from apifiles3 import get_file_size
 from apifiles3 import get_file_list
 from apifiles3 import get_taric_filepath
 from apifiles3 import get_taric_index_file
-from apifiles3 import read_taric_file
+from apifiles3 import stream_taric_file
 from apifiles3 import save_temp_taric_file
 from apifiles3 import rename_taric_file
 from apifiles3 import remove_temp_taric_file
@@ -317,16 +317,14 @@ def taricfiles(seq):
         logger.info("seq is invalid")
         return Response("400 Bad request [invalid seq]", status = 400)
 
-    logger.debug("seq is " + seq)
+    logger.info("seq is " + seq)
 
-    # open the file and return as XML
-    # Note max file generated is 50MB so may be no need to yield in chunks
-    content = read_taric_file(seq)
-    if content is None:
+    body_generator = stream_taric_file(seq)
+    if body_generator is None:
         logger.info("Requested file not found " + seq)
         return Response("404 Taric file does not exist", status = 404)
 
-    return Response(content, mimetype="text/xml")
+    return Response(body_generator, mimetype="text/xml")
 
 
 # --------------------------------------------------------------------

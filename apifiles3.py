@@ -4,8 +4,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from config import AWS_BUCKET_NAME, TARIC_FILES_FOLDER, TARIC_FILES_INDEX
-
+from config import AWS_BUCKET_NAME, TARIC_FILES_FOLDER, TARIC_FILES_INDEX, STREAM_CHUNK_SIZE
 
 logger = logging.getLogger('taricapi.files3')
 
@@ -88,15 +87,28 @@ def get_file_size(filepath):
         logger.error("Error opening " + filepath + " : ")
         return None
 
+
 def read_file(filepath):
+    generator = stream_file(filepath)
+    return b''.join(x for x in generator) if generator else None
+
+
+def stream_file(filepath):
     try:
-        response = session().get_object(Bucket = AWS_BUCKET_NAME,
+        obj = session().get_object(Bucket = AWS_BUCKET_NAME,
                                         Key = filepath)
-        return response['Body'].read()
 
     except ClientError:
         logger.error("Error opening " + filepath + " : ")
         return None
+
+    else:
+        while True:
+            chunk = obj['Body'].read(STREAM_CHUNK_SIZE)
+            if chunk:
+                yield chunk
+            else:
+                break
 
 def write_file(filepath, jsoncontent):
  #   session().upload_fileobj(Fileobj = jsoncontent,
@@ -156,8 +168,8 @@ def get_temp_taric_filepath(seq):
 def get_taric_index_file():
     return TARIC_FILES_INDEX
 
-def read_taric_file(seq):
-    return read_file(get_taric_filepath(seq))
+def stream_taric_file(seq):
+    return stream_file(get_taric_filepath(seq))
 
 def save_temp_taric_file(file, seq):
     filename = get_temp_taric_filepath(seq)

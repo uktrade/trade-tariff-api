@@ -8,6 +8,8 @@ from datetime import datetime
 
 
 # Taric file location and Index name
+from config import STREAM_CHUNK_SIZE
+
 TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
 TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
 
@@ -37,11 +39,23 @@ def file_exists (prefix, file):
     return os.path.isfile(file)
 
 def read_file(filepath):
+    generator = stream_file(filepath)
+    return ''.join(x for x in generator) if generator else None
+
+def stream_file(filepath):
     try:
-        return open(filepath).read()
+         f = open(filepath)
     except IOError as exc:
         logger.error("Error opening " + filepath + " : " + str(exc))
-        return None
+        yield None
+
+    else:
+        while True:
+            chunk = f.read(STREAM_CHUNK_SIZE)
+            if chunk:
+                yield chunk
+            else:
+                break
 
 def write_file(filepath, jsoncontent):
     with open(filepath, "w") as f:
@@ -63,8 +77,8 @@ def get_temp_taric_filepath(seq):
 def get_taric_index_file():
     return TARIC_FILES_INDEX
 
-def read_taric_file(seq):
-    return read_file(get_taric_filepath(seq))
+def stream_taric_file(seq):
+    return stream_file(get_taric_filepath(seq))
 
 def save_temp_taric_file(file, seq):
     filename = get_temp_taric_filepath(seq)

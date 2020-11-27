@@ -36,3 +36,5 @@ LOGGING = {
     'taricapi': {'level': 'INFO', 'handlers': ['wsgi']},
     'flask': {'level': 'INFO', 'handlers': ['wsgi']},
 }
+
+STREAM_CHUNK_SIZE = 1024 * 512  # ~0.5mb
