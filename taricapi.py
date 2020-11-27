@@ -1,3 +1,11 @@
+import signal
+import time
+
+from gevent import monkey
+from gevent.pywsgi import WSGIServer
+
+monkey.patch_all()
+import gevent
 import os
 import sys
 import io
@@ -8,7 +16,7 @@ import datetime
 import hashlib
 
 # Use apifile for file system, apifiles3 for AWS S3
-from config import API_ROOT, APIKEYS, APIKEYS_UPLOAD, WHITELIST, WHITELIST_UPLOAD
+from config import API_ROOT, APIKEYS, APIKEYS_UPLOAD, WHITELIST, WHITELIST_UPLOAD, PORT
 from apifiles3 import file_client
 from apifiles3 import modification_date
 from apifiles3 import md5
@@ -34,13 +42,11 @@ from flask import make_response
 from flask import request
 from flask import Response
 
-from waitress import serve
-
 
 app = Flask(__name__)
 
 # Define logging for debugging
-logger = logging.getLogger('taricapi')
+logger = app.logger
 logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.DEBUG)
@@ -412,8 +418,22 @@ def taricfiles_upload(seq):
     return Response("200 OK File uploaded", status = 200)
 
 
-# run the application
-if __name__ == "__main__":
+def get_server():
+    server = WSGIServer(('0.0.0.0', PORT), app, log=app.logger)
+
+    return server
+
+
+def main():
     rebuild_index(False)
-    #app.run()
-    serve(app)
+    server = get_server()
+
+    gevent.signal_handler(signal.SIGTERM, server.stop)
+    gevent.signal_handler(signal.SIGTERM, server.stop)
+
+    server.serve_forever()
+    gevent.get_hub().join()
+
+
+if __name__ == '__main__':
+    main()
