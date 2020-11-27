@@ -8,6 +8,7 @@ import datetime
 import hashlib
 
 # Use apifile for file system, apifiles3 for AWS S3
+from config import API_ROOT, APIKEYS, APIKEYS_UPLOAD, WHITELIST, WHITELIST_UPLOAD
 from apifiles3 import file_client
 from apifiles3 import modification_date
 from apifiles3 import md5
@@ -37,20 +38,6 @@ from waitress import serve
 
 
 app = Flask(__name__)
-
-# External API endpoint - default for local running
-API_ROOT = os.environ.get("API_ROOT", "http://localhost:8080/api/v1/")
-
-# API KEYS & WHITELISTS - no defaults
-env_apikeys = os.environ.get('APIKEYS','')
-env_apikeys_upload = os.environ.get("APIKEYS_UPLOAD","")
-env_whitelist = os.environ.get("WHITELIST","")
-env_whitelist_upload = os.environ.get("WHITELIST_UPLOAD","")
-
-APIKEYS = "" if env_apikeys is None else env_apikeys.split(",")
-APIKEYS_UPLOAD = "" if env_apikeys_upload is None else env_apikeys_upload.split(",")
-WHITELIST = "" if env_whitelist is None else env_whitelist.split(",")
-WHITELIST_UPLOAD = "" if env_whitelist_upload is None else env_whitelist_upload.split(",")
 
 # Define logging for debugging
 logger = logging.getLogger('taricapi')
@@ -377,7 +364,6 @@ def taricfiles_upload(seq):
         return Response("400 Bad request [invalid seq]", status = 400)
 
     logger.debug("seq is " + seq)
-
     if 'file' not in request.files:
         logger.info('No file uploaded')
         return Response("400 No file uploaded", status = 400)

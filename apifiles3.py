@@ -1,26 +1,21 @@
-import os
 import boto3
 import hashlib
 import logging
 
 from botocore.exceptions import ClientError
 
-# Taric file location and Index name
+from config import AWS_BUCKET_NAME, TARIC_FILES_FOLDER, TARIC_FILES_INDEX
 
-TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
-TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
-
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
-AWS_BUCKET_NAME = os.environ.get("AWS_BUCKET_NAME", "")
 
 logger = logging.getLogger('taricapi-files3')
 
 sid = None
 
+
 def file_client(plogger):
     global logger
     logger = plogger
+
 
 # AWS S3 session
 def session():
@@ -30,20 +25,14 @@ def session():
     if sid is not None:
         return sid
 
-    if AWS_ACCESS_KEY_ID is not "" and AWS_SECRET_ACCESS_KEY is not "" and AWS_BUCKET_NAME is not "":
-
-        try:
-            s3c = boto3.client('s3',
-                                aws_access_key_id = AWS_ACCESS_KEY_ID,
-                                aws_secret_access_key = AWS_SECRET_ACCESS_KEY)
-            sid = s3c
-        except ClientError:
-            logger.error("Error connecting to AWS S3")
-            return None
-
-        return s3c
-    else:
+    try:
+        s3c = boto3.client('s3')
+        sid = s3c
+    except ClientError:
+        logger.error("Error connecting to AWS S3")
         return None
+
+    return s3c
 
 
 # -------------------------------------------------
