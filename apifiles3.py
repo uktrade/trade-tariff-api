@@ -4,7 +4,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from config import AWS_BUCKET_NAME, TARIC_FILES_FOLDER, TARIC_FILES_INDEX, STREAM_CHUNK_SIZE
+from config import AWS_BUCKET_NAME, TARIC_FILES_FOLDER, TARIC_FILES_INDEX, STREAM_CHUNK_SIZE, S3_ENDPOINT_URL
 
 logger = logging.getLogger('taricapi.files3')
 
@@ -20,7 +20,7 @@ def session():
         return sid
 
     try:
-        s3c = boto3.client('s3')
+        s3c = boto3.client('s3', endpoint_url=S3_ENDPOINT_URL)
         sid = s3c
     except ClientError:
         logger.error("Error connecting to AWS S3")
@@ -149,7 +149,10 @@ def get_file_list(prefix):
         prefix = TARIC_FILES_FOLDER
     files = session().list_objects(Bucket = AWS_BUCKET_NAME,
                                    Prefix = prefix)
-    return files['Contents']
+    try:
+        return files['Contents']
+    except KeyError:
+        return []
 
 
 def md5(filepath):

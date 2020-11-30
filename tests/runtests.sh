@@ -28,6 +28,10 @@ URL=http://localhost:8080
 APIURLLIST=http://localhost:8080/api/v1/taricdeltas
 APIURLFILE=http://localhost:8080/api/v1/taricfiles
 
+test "Server comes alive within 30 seconds"
+curl --retry 30 --retry-delay 1 --retry-connrefused ${URL} -o /dev/null
+assert "0" "$?"
+
 test "No API KEY or whitelisted IP -> expect 403"
 out=$(curl -s -w "%{http_code}" -o /dev/null $APIURLLIST)
 assert "403" "$out"
@@ -129,3 +133,7 @@ assert "200" "$out"
 echo
 echo "RUN: $tests_run tests"
 echo "PASS: $tests_passed tests"
+
+if [ $tests_run != $tests_passed ]; then
+    exit 1
+fi
