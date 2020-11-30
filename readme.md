@@ -127,10 +127,8 @@ The strategy is to use a Unix shell script and curl commands, compare the respon
 
 `tests/runtests.sh` checks API response codes against expected. Note that the http header X-Forwarded-For is inserted for local testing. This should be removed when testing via a proxy or in a cloud environment. 
 
-`tests/testserver.sh` is a sample script to start a server locally with environment variables.
+`tests/testserver.sh` is a sample script to start a server locally with environment variables. `tests/start-minio.sh` and `tests/stop-minio.sh` control a MinIO server that is used for providing an S3-compliant backend for the API during tests.
 
-Note that test data setup and cleardown are not provided at this time.
- 
 # Further detail
 
 The complete API specification is documented and available in a separate word document.

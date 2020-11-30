@@ -98,9 +98,9 @@ def stream_file(filepath):
         obj = session().get_object(Bucket = AWS_BUCKET_NAME,
                                         Key = filepath)
 
-    except ClientError:
+    except session().exceptions.NoSuchKey as e:
         logger.error("Error opening " + filepath + " : ")
-        return None
+        raise e
 
     else:
         while True:
@@ -172,6 +172,9 @@ def get_taric_index_file():
     return TARIC_FILES_INDEX
 
 def stream_taric_file(seq):
+    if not file_exists(get_taric_filepath(seq)):
+        return None
+
     return stream_file(get_taric_filepath(seq))
 
 def save_temp_taric_file(file, seq):

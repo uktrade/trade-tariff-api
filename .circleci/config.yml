@@ -37,5 +37,4 @@ jobs:
           command: |
             . venv/bin/activate
             ./tests/testserver.sh
-            sleep 10
             ./tests/runtests.sh
