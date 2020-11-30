@@ -114,12 +114,16 @@ cf set-env APP-NAME API_ROOT "https://APP-NAME.domain"
 
 ## Updating dependencies
 
-Edit `requirements.in` or `requirements-dev.in` and run the following
+Edit `requirements.in` or `requirements-dev.in` and run the following:
 
 ```
-$ pip-compile requirements.in
-$ pip-compile requirements-dev.in
+$ make save-requirements
 ```
+
+# Linting
+`make check` runs a suite of linting tools across the codebase. These checks are enforced through CI.
+
+`pre-commit` is used to help spot problems before committing. Run `pre-commit install --install-hooks` to perform one-off setup of these hooks.
 
 # Testing
 

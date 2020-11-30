@@ -1,0 +1,20 @@
+repos:
+- repo: git://github.com/pre-commit/pre-commit-hooks
+  rev: v1.2.3
+  hooks:
+    - id: check-ast
+    - id: check-case-conflict
+    - id: debug-statements
+    - id: end-of-file-fixer
+- repo: local
+  hooks:
+    - id: pylint
+      name: pylint
+      entry: env PYTHONPATH=app python3 -m pylint.__main__ --rcfile .pylintrc
+      language: system
+      types: [python]
+    - id: flake8
+      name: flake8
+      entry: flake8
+      language: system
+      types: [python]

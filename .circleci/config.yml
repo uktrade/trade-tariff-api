@@ -29,9 +29,8 @@ jobs:
       - run:
           name: Run static checks
           command: |
-            # make check
             . venv/bin/activate
-            echo hi
+            make check
       - run:
           name: Run unit tests
           command: |
