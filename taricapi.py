@@ -282,7 +282,19 @@ def check():
 
 @app.route("/healthcheck")
 def healthcheck():
-    return Response("OK", status=200)
+    return Response(
+        """
+<?xml version="1.0" encoding="UTF-8"?>
+<pingdom_http_custom_check>
+    <status>OK</status>
+</pingdom_http_custom_check>
+""",
+        status=200,
+        headers={
+            "Content-Type": "text/xml",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+    )
 
 
 @app.route("/")
