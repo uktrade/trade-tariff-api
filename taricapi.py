@@ -10,12 +10,14 @@ import io
 import hashlib
 import datetime
 
-from IPy import IP
-from lxml import etree
-from gevent.pywsgi import WSGIServer
-import gevent
 from flask import Flask, render_template, make_response, request, Response
 from flask.logging import create_logger
+from gevent.pywsgi import WSGIServer
+import gevent
+from IPy import IP
+from lxml import etree
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from apifiles3 import write_file
 from apifiles3 import remove_temp_taric_file
@@ -39,6 +41,7 @@ from config import (
     PORT,
     LOGGING,
     NUM_PROXIES,
+    SENTRY_DSN,
 )
 
 
@@ -449,6 +452,11 @@ def taricfiles_upload(seq):
 
 
 def get_server():
+    if SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN, integrations=[FlaskIntegration()],
+        )
+
     server = WSGIServer(("0.0.0.0", PORT), app, log=app.logger)
 
     return server
