@@ -46,7 +46,7 @@ from config import (
 
 dictConfig(LOGGING)
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 logger = create_logger(app)
 
 
@@ -276,7 +276,7 @@ def check():
         + " @ "
         + " ".join(get_remoteaddr(request))
     )
-    return render_template("index.html", message=message)
+    return render_template("check.html", message=message)
 
 
 @app.route("/healthcheck")
@@ -286,7 +286,7 @@ def healthcheck():
 
 @app.route("/")
 def hello():
-    return Response("", status=404)
+    return render_template("index.html")
 
 
 # --------------------------------------------------------------------------------------------
