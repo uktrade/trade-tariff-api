@@ -81,6 +81,10 @@ test "taricfiles - All correct -> expect 200"
 out=$(curl -s -i -H "X-API-KEY: abc123" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" -w "%{http_code}" -o /dev/null $APIURLFILE/180251)
 assert "200" "$out"
 
+test "X-Robots-Tag header is present on responses -> expect noindex, nofollow"
+out=$(curl -s -i -I -H "X-API-KEY: abc123" $APIURLFILE/180251 | grep "X-Robots-Tag: noindex, nofollow")
+assert "0" "$?"
+
 
 
 test "API key not allowed for upload -> expect 403"

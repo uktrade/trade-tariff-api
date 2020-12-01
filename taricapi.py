@@ -457,6 +457,11 @@ def get_server():
             dsn=SENTRY_DSN, integrations=[FlaskIntegration()],
         )
 
+    @app.after_request
+    def add_x_robots(response):  # pylint: disable=W0612
+        response.headers['X-Robots-Tag'] = 'noindex, nofollow'
+        return response
+
     server = WSGIServer(("0.0.0.0", PORT), app, log=app.logger)
 
     return server
