@@ -159,7 +159,10 @@ def get_file_list(prefix):
 
 def md5(filepath):
     hash_md5 = hashlib.md5()
-    hash_md5.update(read_file(filepath))
+
+    for chunk in stream_file(filepath):
+        hash_md5.update(chunk)
+
     return hash_md5.hexdigest()
 
 
