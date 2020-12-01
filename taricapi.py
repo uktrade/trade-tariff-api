@@ -38,6 +38,7 @@ from config import (
     WHITELIST_UPLOAD,
     PORT,
     LOGGING,
+    NUM_PROXIES,
 )
 
 
@@ -72,9 +73,9 @@ def get_remoteaddr(request):
         logger.info("Remote addresses are %s", request.environ["HTTP_X_FORWARDED_FOR"])
         remoteaddrs = request.environ["HTTP_X_FORWARDED_FOR"].split(",")
 
-    if len(remoteaddrs) > 2:
+    if len(remoteaddrs) > NUM_PROXIES:
         logger.warning("Additional remote addresses stripped (possible spoofing)")
-        remoteaddrs = remoteaddrs[-2:]
+        remoteaddrs = remoteaddrs[-NUM_PROXIES:]
 
     return remoteaddrs
 

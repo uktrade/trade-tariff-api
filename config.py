@@ -37,3 +37,5 @@ STREAM_CHUNK_SIZE = 1024 * 512  # ~0.5mb
 
 # This only needs to be set under testing conditions to use MinIO - in local and deployed envs, we use AWS S3.
 S3_ENDPOINT_URL = os.environ.get("S3_ENDPOINT_URL", None)
+
+NUM_PROXIES = int(os.environ.get("NUM_PROXIES", 0))
