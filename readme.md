@@ -30,9 +30,9 @@ For example:
 e.g.
 
 ```
-curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas
+curl localhost:8080/api/v1/taricdeltas
 
-curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas/2018-12-01
+curl localhost:8080/api/v1/taricdeltas/2018-12-01
 ```
 ### taricfiles -- Get specific file
 
@@ -42,7 +42,7 @@ curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas/2018-12-01
 
 e.g.
 ```
-curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricfiles/18004
+curl localhost:8080/api/v1/taricfiles/18004
 ```
 
 
@@ -61,13 +61,9 @@ curl --form file=@/users/dave/downloads/Taric3_files/TGB18146.xml -H "X-API-KEY:
 
 # Security mechanisms
 
-Api key (`X-API-KEY`) in HTTP request header is required for authentication.
+The API is readable publicly without authentication.
 
-Api key for upload is separate.
-
-Access to the API endpoints is for whitelisted IP addresses. IP address is identified from the request header and using the `X-Forwarded-For` header if available. 
-
-Uploads are permitted from separate whitelist of IP addresses.
+An API key (`X-API-KEY`) is required to upload new files. Access to the upload API endpoint is restricted to a set of whitelisted IPs both by the app and by an IP filtering route service.
 
 
 # Installation
