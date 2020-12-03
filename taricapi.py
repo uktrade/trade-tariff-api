@@ -391,7 +391,11 @@ def taricfiles(seq):
         logger.debug("Requested file not found %s", seq)
         return Response("404 Taric file does not exist", status=404)
 
-    return Response(body_generator, mimetype="text/xml")
+    return Response(
+        body_generator,
+        mimetype="text/xml",
+        headers={"Content-Length": get_file_size(get_taric_filepath(seq))},
+    )
 
 
 # --------------------------------------------------------------------
