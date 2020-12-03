@@ -1,5 +1,6 @@
 import os
 
+from utils import strtobool
 
 PORT = int(os.environ.get("PORT", 8080))
 
@@ -40,3 +41,5 @@ S3_ENDPOINT_URL = os.environ.get("S3_ENDPOINT_URL", None)
 
 NUM_PROXIES = int(os.environ.get("NUM_PROXIES", 0))
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
+
+REQUIRE_AUTH_FOR_READS = strtobool(os.environ.get('REQUIRE_AUTH_FOR_READS', 'true'))

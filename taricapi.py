@@ -41,6 +41,7 @@ from config import (
     PORT,
     LOGGING,
     NUM_PROXIES,
+    REQUIRE_AUTH_FOR_READS,
     SENTRY_DSN,
 )
 
@@ -119,9 +120,12 @@ def in_apikeys_upload(apikey):
 
 
 def is_auth(request):
-    apikey = get_apikey(request)
-    remoteaddr = get_remoteaddr(request)
-    return in_apikeys(apikey) and in_whitelist(remoteaddr)
+    if REQUIRE_AUTH_FOR_READS:
+        apikey = get_apikey(request)
+        remoteaddr = get_remoteaddr(request)
+        return in_apikeys(apikey) and in_whitelist(remoteaddr)
+
+    return True
 
 
 def is_auth_upload(request):
