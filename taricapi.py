@@ -10,6 +10,7 @@ import io
 import hashlib
 import datetime
 
+from elasticapm.contrib.flask import ElasticAPM
 from flask import Flask, render_template, make_response, request, Response
 from flask.logging import create_logger
 from gevent.pywsgi import WSGIServer
@@ -43,6 +44,9 @@ from config import (
     NUM_PROXIES,
     REQUIRE_AUTH_FOR_READS,
     SENTRY_DSN,
+    ELASTIC_APM_TOKEN,
+    ELASTIC_APM_URL,
+    ENVIRONMENT,
 )
 
 
@@ -465,6 +469,23 @@ def get_server():
     def add_x_robots(response):  # pylint: disable=W0612
         response.headers['X-Robots-Tag'] = 'noindex, nofollow'
         return response
+
+    elastic_apm_url = ELASTIC_APM_URL
+    elastic_apm_secret_token = ELASTIC_APM_TOKEN
+    elastic_apm = (
+        {
+            'SERVICE_NAME': 'public-tariffs-api',
+            'SECRET_TOKEN': elastic_apm_secret_token,
+            'SERVER_URL': elastic_apm_url,
+            'ENVIRONMENT': ENVIRONMENT,
+        }
+        if elastic_apm_url and elastic_apm_secret_token
+        else {}
+    )
+
+    if elastic_apm:
+        app.config['ELASTIC_APM'] = elastic_apm
+        ElasticAPM(app)
 
     server = WSGIServer(("0.0.0.0", PORT), app, log=app.logger)
 
