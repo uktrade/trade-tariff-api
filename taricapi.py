@@ -9,6 +9,7 @@ import json
 import io
 import hashlib
 import datetime
+import threading
 
 from elasticapm.contrib.flask import ElasticAPM
 from flask import Flask, render_template, make_response, request, Response
@@ -201,34 +202,39 @@ def create_index_entry(seq):
 # Rebuild master file index (JSON)
 # --------------------------------
 def rebuild_index(nocheck):
-    if not file_exists(get_taric_index_file()) or nocheck:
-        logger.info("*** Rebuilding file index... ***")
-        all_deltas = []
+    def _rebuild_index():
+        if not file_exists(get_taric_index_file()) or nocheck:
+            logger.info("*** Rebuilding file index... ***")
+            all_deltas = []
 
-        files = get_file_list(None)
-        logger.info("%s", files)
-        for file in files:
-            # build entry for file just uploaded
-            # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
-            # TODO - combine with individual update_index..
-            f = file["Key"]
-            f = f[f.rindex("/") + 1 :]  # remove folder prefix
-            logger.info("Found file %s", f)
+            files = get_file_list(None)
+            logger.info("%s", files)
+            for file in files:
+                # build entry for file just uploaded
+                # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
+                # TODO - combine with individual update_index..
+                f = file["Key"]
+                f = f[f.rindex("/") + 1 :]  # remove folder prefix
+                logger.info("Found file %s", f)
 
-            if f.startswith("TEMP_"):
-                logger.info("Removing temporary file %s", f)
-                seq = f[5:-4]  # remove TEMP_ file prefix and .xml extension
-                remove_temp_taric_file(seq)
-            else:
-                if is_valid_seq(f[:-4]):  # ignore non taric files
-                    seq = f[:-4]  # remove .xml extension
-                    all_deltas.append(create_index_entry(seq))
+                if f.startswith("TEMP_"):
+                    logger.info("Removing temporary file %s", f)
+                    seq = f[5:-4]  # remove TEMP_ file prefix and .xml extension
+                    remove_temp_taric_file(seq)
+                else:
+                    if is_valid_seq(f[:-4]):  # ignore non taric files
+                        seq = f[:-4]  # remove .xml extension
+                        all_deltas.append(create_index_entry(seq))
 
-        logger.debug("%s delta files listed after update", str(len(all_deltas)))
+            logger.debug("%s delta files listed after update", str(len(all_deltas)))
 
-        # persist updated index
-        all_deltass = json.dumps(all_deltas)
-        write_file(get_taric_index_file(), all_deltass)
+            # persist updated index
+            all_deltass = json.dumps(all_deltas)
+            write_file(get_taric_index_file(), all_deltass)
+            logger.info("Index rebuild complete")
+
+    logger.debug("Starting thread to rebuild index.")
+    threading.Thread(target=_rebuild_index).start()
 
 
 @app.route("/api/v1/rebuildindex", methods=["POST"])
@@ -238,7 +244,7 @@ def rebuild_index_controller():
         return Response("403 Unauthorised", status=403)
 
     rebuild_index(True)
-    return Response("200 Index rebuilt", status=200)
+    return Response("202 index is being rebuilt", status=202)
 
 
 # -------------------------------
