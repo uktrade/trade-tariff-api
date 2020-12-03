@@ -47,3 +47,7 @@ REQUIRE_AUTH_FOR_READS = strtobool(os.environ.get('REQUIRE_AUTH_FOR_READS', 'tru
 
 ELASTIC_APM_URL = os.environ.get('ELASTIC_APM_URL', None)
 ELASTIC_APM_TOKEN = os.environ.get('ELASTIC_APM_TOKEN', None)
+
+
+GA_TRACKING_ID = os.environ.get('GA_TRACKING_ID', None)
+GA_ENDPOINT = os.environ.get('GA_ENDPOINT', 'https://www.google-analytics.com/collect')

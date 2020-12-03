@@ -2,14 +2,15 @@ from gevent import monkey  # noqa: E402  #  pylint: disable=C0411, C0412, C0413
 
 monkey.patch_all()  # noqa: E402  # pylint: disable=C0411, C0413
 
+import datetime
+import hashlib
+import io
+import json
+from logging.config import dictConfig
 import re
 import signal
-from logging.config import dictConfig
-import json
-import io
-import hashlib
-import datetime
 import threading
+import uuid
 
 from elasticapm.contrib.flask import ElasticAPM
 from flask import Flask, render_template, make_response, request, Response
@@ -18,6 +19,7 @@ from gevent.pywsgi import WSGIServer
 import gevent
 from IPy import IP
 from lxml import etree
+import requests
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -48,6 +50,8 @@ from config import (
     ELASTIC_APM_TOKEN,
     ELASTIC_APM_URL,
     ENVIRONMENT,
+    GA_TRACKING_ID,
+    GA_ENDPOINT,
 )
 
 
@@ -196,6 +200,33 @@ def create_index_entry(seq):
         "size": get_file_size(get_taric_filepath(seq)),
     }
     return index_entry
+
+
+# ----------------
+# Google Analytics
+# ----------------
+
+
+def _send_to_google_analytics(
+    requester_ip, request_host, request_path, request_headers
+):
+    logger.debug('Sending to Google Analytics %s: %s...', request_host, request_path)
+    requests.post(
+        GA_ENDPOINT,
+        data={
+            'v': '1',
+            'tid': GA_TRACKING_ID,
+            'cid': str(uuid.uuid4()),
+            't': 'pageview',
+            'uip': requester_ip,
+            'dh': request_host,
+            'dp': request_path,
+            'ds': 'public-tariffs-api',
+            'dr': request_headers.get('referer', ''),
+            'ua': request_headers.get('user-agent', ''),
+        },
+    )
+    logger.info("sent to ga")
 
 
 # --------------------------------
@@ -478,7 +509,19 @@ def get_server():
     @app.after_request
     def add_x_robots(response):  # pylint: disable=W0612
         response.headers['X-Robots-Tag'] = 'noindex, nofollow'
-        response.headers['Strict-Transport-Security'] = "max-age=31536000; includeSubDomains"
+        response.headers[
+            'Strict-Transport-Security'
+        ] = "max-age=31536000; includeSubDomains"
+
+        if GA_TRACKING_ID:
+            gevent.spawn(
+                _send_to_google_analytics,
+                request.remote_addr,
+                request.host_url,
+                request.path,
+                request.headers,
+            )
+
         return response
 
     elastic_apm_url = ELASTIC_APM_URL
