@@ -1,0 +1,39 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8.5
+      - image: minio/minio
+        environment:
+          MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
+          MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+          MINIO_REGION: us-east-1
+        entrypoint: sh
+        command: ['-c', 'mkdir -p /data/tariffs-api-test-bucket && minio server /data']
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          key: v1-python-requirements-{{ checksum "requirements-dev.txt" }}
+      - run:
+          name: Install requirements
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements-dev.txt
+            pip-sync requirements-dev.txt
+      - save_cache:
+          key: v1-python-requirements-{{ checksum "requirements-dev.txt" }}
+          paths: 
+            - venv
+      - run:
+          name: Run static checks
+          command: |
+            . venv/bin/activate
+            make check
+      - run:
+          name: Run unit tests
+          command: |
+            . venv/bin/activate
+            ./tests/testserver.sh
+            ./tests/runtests.sh

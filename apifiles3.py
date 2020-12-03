@@ -1,49 +1,38 @@
-import os
-import boto3
 import hashlib
 import logging
 
+import boto3
 from botocore.exceptions import ClientError
 
-# Taric file location and Index name
+from config import (
+    AWS_BUCKET_NAME,
+    TARIC_FILES_FOLDER,
+    TARIC_FILES_INDEX,
+    STREAM_CHUNK_SIZE,
+    S3_ENDPOINT_URL,
+)
 
-TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
-TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
-
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
-AWS_BUCKET_NAME = os.environ.get("AWS_BUCKET_NAME", "")
-
-logger = logging.getLogger('taricapi-files3')
+logger = logging.getLogger("taricapi.files3")
 
 sid = None
 
-def file_client(plogger):
-    global logger
-    logger = plogger
 
 # AWS S3 session
 def session():
 
     # return cached client id
-    global sid
+    global sid  # pylint: disable=W0603
     if sid is not None:
         return sid
 
-    if AWS_ACCESS_KEY_ID is not "" and AWS_SECRET_ACCESS_KEY is not "" and AWS_BUCKET_NAME is not "":
-
-        try:
-            s3c = boto3.client('s3',
-                                aws_access_key_id = AWS_ACCESS_KEY_ID,
-                                aws_secret_access_key = AWS_SECRET_ACCESS_KEY)
-            sid = s3c
-        except ClientError:
-            logger.error("Error connecting to AWS S3")
-            return None
-
-        return s3c
-    else:
+    try:
+        s3c = boto3.client("s3", endpoint_url=S3_ENDPOINT_URL)
+        sid = s3c
+    except ClientError:
+        logger.error("Error connecting to AWS S3")
         return None
+
+    return s3c
 
 
 # -------------------------------------------------
@@ -54,111 +43,126 @@ def session():
 
 # generic file functions
 def modification_date(filepath):
-    response = session().get_object(Bucket = AWS_BUCKET_NAME,
-                                    Key = filepath)
-    print(response)
-    md = response['Metadata']
-    if 'modified' in md:
-        modtime = md['modified']
+    response = session().get_object(Bucket=AWS_BUCKET_NAME, Key=filepath)
+    md = response["Metadata"]
+    if "modified" in md:
+        modtime = md["modified"]
     else:
-        modtime = response['LastModified'].isoformat()[:19]
+        modtime = response["LastModified"].isoformat()[:19]
 
     return modtime
 
-def find(list, key, value):
-    for i, dic in enumerate(list):
+
+def find(list_, key, value):
+    for i, dic in enumerate(list_):
         if dic[key] == value:
             return i
     return -1
 
+
 def file_exists(filename):
     try:
-        response = session().get_object(Bucket = AWS_BUCKET_NAME,
-                                        Key = filename)
+        session().get_object(Bucket=AWS_BUCKET_NAME, Key=filename)
         return True
 
     except session().exceptions.NoSuchKey:
         return False
 
-    except ClientError:
-        logger.error("Error occurred in get_object for " + filename + " : " + ClientError)
+    except ClientError as e:
+        logger.error("Error occurred in get_object for %s: %s", filename, e)
         return None
+
 
 def get_file(filepath):
     try:
-        response = session().get_object(Bucket = AWS_BUCKET_NAME,
-                                        Key = filepath)
-        return response['Body']
+        response = session().get_object(Bucket=AWS_BUCKET_NAME, Key=filepath)
+        return response["Body"]
 
-    except ClientError:
-        logger.error("Error opening " + filepath + " : ")
+    except ClientError as e:
+        logger.error("Error opening %s: %s", filepath, e)
         return None
+
 
 def get_file_size(filepath):
     try:
-        response = session().get_object(Bucket = AWS_BUCKET_NAME,
-                                        Key = filepath)
-        return response['ContentLength']
+        response = session().get_object(Bucket=AWS_BUCKET_NAME, Key=filepath)
+        return response["ContentLength"]
 
-    except ClientError:
-        logger.error("Error opening " + filepath + " : ")
+    except ClientError as e:
+        logger.error("Error opening %s: %s", filepath, e)
         return None
+
 
 def read_file(filepath):
-    try:
-        response = session().get_object(Bucket = AWS_BUCKET_NAME,
-                                        Key = filepath)
-        return response['Body'].read()
+    generator = stream_file(filepath)
+    return b"".join(x for x in generator)
 
-    except ClientError:
-        logger.error("Error opening " + filepath + " : ")
-        return None
+
+def stream_file(filepath):
+    try:
+        obj = session().get_object(Bucket=AWS_BUCKET_NAME, Key=filepath)
+
+    except session().exceptions.NoSuchKey as e:
+        logger.error("Error opening %s: %s", filepath, e)
+        raise e
+
+    else:
+        while True:
+            chunk = obj["Body"].read(STREAM_CHUNK_SIZE)
+            if chunk:
+                yield chunk
+            else:
+                break
+
 
 def write_file(filepath, jsoncontent):
- #   session().upload_fileobj(Fileobj = jsoncontent,
- #                            Bucket = AWS_BUCKET_NAME,
- #                            Key = filepath)
+    session().put_object(Body=jsoncontent, Bucket=AWS_BUCKET_NAME, Key=filepath)
 
-    session().put_object(Body = jsoncontent,
-                         Bucket = AWS_BUCKET_NAME,
-                         Key = filepath)
 
 def create_multipart_upload(filename):
-    resp = session().create_multipart_upload(Bucket = AWS_BUCKET_NAME,
-                                             Key = filename)
-    logger.debug(resp)
-    return resp['UploadId']
+    resp = session().create_multipart_upload(Bucket=AWS_BUCKET_NAME, Key=filename)
+    logger.debug("%s", resp)
+    return resp["UploadId"]
+
 
 def upload_part(filename, uploadid, partnumber, bodypart):
-    session().upload_part(Bucket = AWS_BUCKET_NAME,
-                          Key = filename,
-                          UploadId = uploadid,
-                          PartNumber = partnumber,
-                          Body = bodypart)
+    session().upload_part(
+        Bucket=AWS_BUCKET_NAME,
+        Key=filename,
+        UploadId=uploadid,
+        PartNumber=partnumber,
+        Body=bodypart,
+    )
+
 
 def complete_multipart_upload(filename, uploadid):
-    session().complete_multipart_upload(Bucket = AWS_BUCKET_NAME,
-                                        Key = filename,
-                                        UploadId = uploadid)
+    session().complete_multipart_upload(
+        Bucket=AWS_BUCKET_NAME, Key=filename, UploadId=uploadid
+    )
+
 
 def abort_multipart_upload(filename, uploadid):
-    session().abort_multipart_upload(Bucket = AWS_BUCKET_NAME,
-                                        Key = filename,
-                                        UploadId = uploadid)
-
+    session().abort_multipart_upload(
+        Bucket=AWS_BUCKET_NAME, Key=filename, UploadId=uploadid
+    )
 
 
 def get_file_list(prefix):
     if prefix is None:
         prefix = TARIC_FILES_FOLDER
-    files = session().list_objects(Bucket = AWS_BUCKET_NAME,
-                                   Prefix = prefix)
-    return files['Contents']
+    files = session().list_objects(Bucket=AWS_BUCKET_NAME, Prefix=prefix)
+    try:
+        return files["Contents"]
+    except KeyError:
+        return []
 
 
 def md5(filepath):
     hash_md5 = hashlib.md5()
-    hash_md5.update(read_file(filepath))
+
+    for chunk in stream_file(filepath):
+        hash_md5.update(chunk)
+
     return hash_md5.hexdigest()
 
 
@@ -166,54 +170,67 @@ def md5(filepath):
 def get_taric_filepath(seq):
     return TARIC_FILES_FOLDER + "/" + seq + ".xml"
 
+
 def get_temp_taric_filepath(seq):
     return TARIC_FILES_FOLDER + "/TEMP_" + seq + ".xml"
+
 
 def get_taric_index_file():
     return TARIC_FILES_INDEX
 
-def read_taric_file(seq):
-    return read_file(get_taric_filepath(seq))
+
+def stream_taric_file(seq):
+    if not file_exists(get_taric_filepath(seq)):
+        return None
+
+    return stream_file(get_taric_filepath(seq))
+
 
 def save_temp_taric_file(file, seq):
     filename = get_temp_taric_filepath(seq)
     write_file(filename, file)
     return filename
 
+
 def remove_temp_taric_file(seq):
     filename = get_temp_taric_filepath(seq)
-    logger.debug("Removing file " + filename)
-    session().delete_object(Bucket = AWS_BUCKET_NAME,
-                            Key = filename)
+    logger.debug("Removing file %s", filename)
+    session().delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
+
 
 def rename_file(fromname, toname):
     # AWS S3 has no rename - have to copy & delete
-    logger.debug("Renaming file from " + fromname + " to " + toname)
+    logger.debug("Renaming file from %s to %s", fromname, toname)
 
-    session().copy_object (Bucket = AWS_BUCKET_NAME,
-                           CopySource = {'Bucket': AWS_BUCKET_NAME, 'Key': fromname},
-                           Key = toname,
-                           MetadataDirective = 'COPY')
+    session().copy_object(
+        Bucket=AWS_BUCKET_NAME,
+        CopySource={"Bucket": AWS_BUCKET_NAME, "Key": fromname},
+        Key=toname,
+        MetadataDirective="COPY",
+    )
 
-    session().delete_object(Bucket = AWS_BUCKET_NAME,
-                            Key = fromname)
+    session().delete_object(Bucket=AWS_BUCKET_NAME, Key=fromname)
+
 
 def rename_taric_file(seq, filetime):
     # AWS S3 has no rename - have to copy & delete
-    logger.debug("Renaming temp file to " + get_taric_filepath(seq))
+    logger.debug("Renaming temp file to %s", get_taric_filepath(seq))
 
     if filetime is not None:
-        logger.debug("Setting Metadata modified to " + filetime)
-        session().copy_object (Bucket = AWS_BUCKET_NAME,
-                               CopySource = {'Bucket': AWS_BUCKET_NAME, 'Key': get_temp_taric_filepath(seq)},
-                               Key = get_taric_filepath(seq),
-                               Metadata = {'modified': filetime},
-                               MetadataDirective = 'REPLACE')
+        logger.debug("Setting Metadata modified to %s", filetime)
+        session().copy_object(
+            Bucket=AWS_BUCKET_NAME,
+            CopySource={"Bucket": AWS_BUCKET_NAME, "Key": get_temp_taric_filepath(seq)},
+            Key=get_taric_filepath(seq),
+            Metadata={"modified": filetime},
+            MetadataDirective="REPLACE",
+        )
     else:
-        session().copy_object (Bucket = AWS_BUCKET_NAME,
-                               CopySource = {'Bucket': AWS_BUCKET_NAME, 'Key': get_temp_taric_filepath(seq)},
-                               Key = get_taric_filepath(seq),
-                               MetadataDirective = 'REPLACE')
+        session().copy_object(
+            Bucket=AWS_BUCKET_NAME,
+            CopySource={"Bucket": AWS_BUCKET_NAME, "Key": get_temp_taric_filepath(seq)},
+            Key=get_taric_filepath(seq),
+            MetadataDirective="REPLACE",
+        )
 
-    session().delete_object(Bucket = AWS_BUCKET_NAME,
-                            Key = get_temp_taric_filepath(seq))
+    session().delete_object(Bucket=AWS_BUCKET_NAME, Key=get_temp_taric_filepath(seq))

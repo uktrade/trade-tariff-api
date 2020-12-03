@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import uuid
 import hashlib
 
@@ -11,9 +13,8 @@ print("================================")
 
 print("\nStore the hashed key below in the APIKEYS environment variable")
 # generate a hash for the key
-hp = hashlib.sha256(apikey.hex.encode('ascii')).hexdigest()
+hp = hashlib.sha256(apikey.hex.encode("ascii")).hexdigest()
 
 print("================================================================")
-print (hp)
+print(hp)
 print("================================================================")
-

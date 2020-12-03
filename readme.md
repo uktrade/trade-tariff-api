@@ -12,10 +12,10 @@ For example:
 
 **DATE**    | **FILE(S)**
 ---|---
-2019-01-02  | 190001
-2019-01-03  | 190002, 190003 
-2019-01-04  | 190004
-2019-01-07  | 190005
+20202-11-02  | 200000, 200001
+20202-11-03  | 200002, 200003 
+20202-11-04  | 200004
+20202-11-07  | 200005
 
 ## API endpoints
 
@@ -30,9 +30,9 @@ For example:
 e.g.
 
 ```
-curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas
+curl localhost:8080/api/v1/taricdeltas
 
-curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas/2018-12-01
+curl localhost:8080/api/v1/taricdeltas/2018-12-01
 ```
 ### taricfiles -- Get specific file
 
@@ -42,7 +42,7 @@ curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricdeltas/2018-12-01
 
 e.g.
 ```
-curl -H "X-API-KEY: abc123" localhost:8080/api/v1/taricfiles/18004
+curl localhost:8080/api/v1/taricfiles/18004
 ```
 
 
@@ -61,13 +61,9 @@ curl --form file=@/users/dave/downloads/Taric3_files/TGB18146.xml -H "X-API-KEY:
 
 # Security mechanisms
 
-Api key (`X-API-KEY`) in HTTP request header is required for authentication.
+The API is readable publicly without authentication.
 
-Api key for upload is separate.
-
-Access to the API endpoints is for whitelisted IP addresses. IP address is identified from the request header and using the `X-Forwarded-For` header if available. 
-
-Uploads are permitted from separate whitelist of IP addresses.
+An API key (`X-API-KEY`) is required to upload new files. Access to the upload API endpoint is restricted to a set of whitelisted IPs both by the app and by an IP filtering route service.
 
 
 # Installation
@@ -94,12 +90,12 @@ AWS_SECRET_ACCESS_KEY   | S3 Secret
 
 
 ##  Local Installation
-virtualenv is recommended
+Virtualenv is recommended. `pip-tools` is used to manage live and dev dependencies.
 
 ```
 $ virtualenv taric-api
 $ source taric-api/bin/activate
-(taric-api) $ pip install -r requirements.txt
+(taric-api) $ pip install -r requirements-dev.txt
 ```
 
 ##  Cloudfoundry Installation
@@ -112,16 +108,27 @@ cf set-env APP-NAME API_ROOT "https://APP-NAME.domain"
 ...
 ```
 
+## Updating dependencies
+
+Edit `requirements.in` or `requirements-dev.in` and run the following:
+
+```
+$ make save-requirements
+```
+
+# Linting
+`make check` runs a suite of linting tools across the codebase. These checks are enforced through CI.
+
+`pre-commit` is used to help spot problems before committing. Run `pre-commit install --install-hooks` to perform one-off setup of these hooks.
+
 # Testing
 
 The strategy is to use a Unix shell script and curl commands, compare the response codes.
 
 `tests/runtests.sh` checks API response codes against expected. Note that the http header X-Forwarded-For is inserted for local testing. This should be removed when testing via a proxy or in a cloud environment. 
 
-`tests/testserver.sh` is a sample script to start a server locally with environment variables.
+`tests/testserver.sh` is a sample script to start a server locally with environment variables. `tests/start-minio.sh` and `tests/stop-minio.sh` control a MinIO server that is used for providing an S3-compliant backend for the API during tests.
 
-Note that test data setup and cleardown are not provided at this time.
- 
 # Further detail
 
 The complete API specification is documented and available in a separate word document.

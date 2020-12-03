@@ -28,6 +28,10 @@ URL=http://localhost:8080
 APIURLLIST=http://localhost:8080/api/v1/taricdeltas
 APIURLFILE=http://localhost:8080/api/v1/taricfiles
 
+test "Server comes alive within 30 seconds"
+curl --retry 30 --retry-delay 1 --retry-connrefused ${URL} -o /dev/null
+assert "0" "$?"
+
 test "No API KEY or whitelisted IP -> expect 403"
 out=$(curl -s -w "%{http_code}" -o /dev/null $APIURLLIST)
 assert "403" "$out"
@@ -76,6 +80,10 @@ assert "200" "$out"
 test "taricfiles - All correct -> expect 200"
 out=$(curl -s -i -H "X-API-KEY: abc123" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" -w "%{http_code}" -o /dev/null $APIURLFILE/180251)
 assert "200" "$out"
+
+test "X-Robots-Tag header is present on responses -> expect noindex, nofollow"
+out=$(curl -s -i -I -H "X-API-KEY: abc123" $APIURLFILE/180251 | grep "X-Robots-Tag: noindex, nofollow")
+assert "0" "$?"
 
 
 
@@ -129,3 +137,7 @@ assert "200" "$out"
 echo
 echo "RUN: $tests_run tests"
 echo "PASS: $tests_passed tests"
+
+if [ $tests_run != $tests_passed ]; then
+    exit 1
+fi

@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
 
-# abc123, def456
-export APIKEYS="6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090,
-8f61ad5cfa0c471c8cbf810ea285cb1e5f9c2c5e5e5e4f58a3229667703e1587"
-# def456
-export APIKEYS_UPLOAD="8f61ad5cfa0c471c8cbf810ea285cb1e5f9c2c5e5e5e4f58a3229667703e1587"
-
-export WHITELIST="1.2.3.4"
-export WHITELIST_UPLOAD="1.2.3.4"
-
-export AWS_BUCKET_NAME="xxx"
-export AWS_ACCESS_KEY_ID="yyy"
-export AWS_SECRET_ACCESS_KEY="zzz"
+source tests/test.env
 
 # assume running from project root folder - and virtualenv already setup
-source taric-api/bin/activate
 python taricapi.py &
+
+until curl localhost:${PORT} > /dev/null; do sleep 1; done
+
+echo "Uploading test fixture"
+curl -s -i -H "X-API-KEY: def456" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" --form file=@tests/DIT123456.xml -w "%{http_code}" -o /dev/null http://localhost:${PORT}/api/v1/taricfiles/180251?modtime=2019-02-05T12:00:00.000
