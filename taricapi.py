@@ -464,7 +464,7 @@ def taricfiles_upload(seq):
 def get_server():
     if SENTRY_DSN:
         sentry_sdk.init(
-            dsn=SENTRY_DSN, integrations=[FlaskIntegration()],
+            dsn=SENTRY_DSN, integrations=[FlaskIntegration()], environment=ENVIRONMENT
         )
 
     @app.after_request
