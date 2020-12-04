@@ -38,14 +38,11 @@ from apifiles3 import md5
 from apifiles3 import modification_date
 from config import (
     API_ROOT,
-    APIKEYS,
     APIKEYS_UPLOAD,
-    WHITELIST,
     WHITELIST_UPLOAD,
     PORT,
     LOGGING,
     NUM_PROXIES,
-    REQUIRE_AUTH_FOR_READS,
     SENTRY_DSN,
     ELASTIC_APM_TOKEN,
     ELASTIC_APM_URL,
@@ -93,15 +90,6 @@ def get_remoteaddr(request):
     return remoteaddrs
 
 
-def in_whitelist(remoteaddrs):
-    for addr in remoteaddrs:
-        for wlip in WHITELIST:
-            logger.debug("%s %s", addr, wlip)
-            if addr in IP(wlip):
-                return True
-    return False
-
-
 def in_whitelist_upload(remoteaddrs):
     for addr in remoteaddrs:
         for wlip in WHITELIST_UPLOAD:
@@ -111,30 +99,12 @@ def in_whitelist_upload(remoteaddrs):
     return False
 
 
-def in_apikeys(apikey):
-    hashed_apikey = str(hashlib.sha256(apikey.encode("ascii")).hexdigest())
-    try:
-        return hashed_apikey in APIKEYS
-
-    except ValueError:
-        return False
-
-
 def in_apikeys_upload(apikey):
     hashed_apikey = hashlib.sha256(apikey.encode("ascii")).hexdigest()
     try:
         return hashed_apikey in APIKEYS_UPLOAD
     except ValueError:
         return False
-
-
-def is_auth(request):
-    if REQUIRE_AUTH_FOR_READS:
-        apikey = get_apikey(request)
-        remoteaddr = get_remoteaddr(request)
-        return in_apikeys(apikey) and in_whitelist(remoteaddr)
-
-    return True
 
 
 def is_auth_upload(request):
@@ -372,10 +342,6 @@ def taricdeltas(date):
         logger.debug("date is invalid")
         return Response("Bad request [invalid date] (400)", status=400)
 
-    if not is_auth(request):
-        logger.debug("API key not provided or not authorised")
-        return Response("403 Unauthorised", status=403)
-
     logger.debug("date is %s", date)
 
     # All Taric files uploaded are stored in the index
@@ -408,11 +374,6 @@ def taricdeltas(date):
 @app.route("/api/v1/taricfiles/<seq>", methods=["GET"])
 @app.route("/api/v1/taricfiles", defaults={"seq": ""}, methods=["GET"])
 def taricfiles(seq):
-
-    if not is_auth(request):
-        logger.debug("API key not provided or not authorised")
-        return Response("403 Unauthorised", status=403)
-
     if not is_valid_seq(seq):
         logger.debug("seq is invalid")
         return Response("400 Bad request [invalid seq]", status=400)

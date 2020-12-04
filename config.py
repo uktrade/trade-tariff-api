@@ -1,7 +1,5 @@
 import os
 
-from utils import strtobool
-
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
 PORT = int(os.environ.get("PORT", 8080))
 
@@ -11,9 +9,7 @@ AWS_BUCKET_NAME = os.environ["AWS_BUCKET_NAME"]
 
 API_ROOT = os.environ.get("API_ROOT", "http://localhost:8080/api/v1/")
 
-APIKEYS = os.environ.get("APIKEYS", "").split(",")
 APIKEYS_UPLOAD = os.environ.get("APIKEYS_UPLOAD", "").split(",")
-WHITELIST = os.environ.get("WHITELIST", "").split(",")
 WHITELIST_UPLOAD = os.environ.get("WHITELIST_UPLOAD", "").split(",")
 
 TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
@@ -42,8 +38,6 @@ S3_ENDPOINT_URL = os.environ.get("S3_ENDPOINT_URL", None)
 
 NUM_PROXIES = int(os.environ.get("NUM_PROXIES", 0))
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
-
-REQUIRE_AUTH_FOR_READS = strtobool(os.environ.get('REQUIRE_AUTH_FOR_READS', 'true'))
 
 ELASTIC_APM_URL = os.environ.get('ELASTIC_APM_URL', None)
 ELASTIC_APM_TOKEN = os.environ.get('ELASTIC_APM_TOKEN', None)
