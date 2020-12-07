@@ -43,5 +43,5 @@ ELASTIC_APM_URL = os.environ.get('ELASTIC_APM_URL', None)
 ELASTIC_APM_TOKEN = os.environ.get('ELASTIC_APM_TOKEN', None)
 
 
-GA_TRACKING_ID = os.environ.get('GA_TRACKING_ID', None)
 GA_ENDPOINT = os.environ.get('GA_ENDPOINT', 'https://www.google-analytics.com/collect')
+GA_TRACKING_ID = os.environ.get('GA_TRACKING_ID', None)
