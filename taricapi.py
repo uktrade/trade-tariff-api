@@ -97,7 +97,8 @@ def in_whitelist(remoteaddrs):
     for addr in remoteaddrs:
         for wlip in WHITELIST:
             logger.debug("%s %s", addr, wlip)
-            if addr in IP(wlip):
+            if addr and addr in IP(wlip):
+                # Config parsing leaves ips called "" if env var does not exist.
                 return True
     return False
 
@@ -106,7 +107,8 @@ def in_whitelist_upload(remoteaddrs):
     for addr in remoteaddrs:
         for wlip in WHITELIST_UPLOAD:
             logger.debug("%s %s", addr, wlip)
-            if addr in IP(wlip):
+            if addr and addr in IP(wlip):
+                # Config parsing leaves ips called "" if env var does not exist.
                 return True
     return False
 
