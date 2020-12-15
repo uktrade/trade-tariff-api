@@ -1,9 +1,4 @@
-import re
-
 from typing import List, Optional, Union
-
-# List regex comma or white space, leading / trailing spaces are removed.
-LIST_REGEX = re.compile(r"\s*[,\s+]\s*", re.UNICODE)
 
 
 def strtobool(text: Union[str, bool]):
@@ -17,4 +12,4 @@ def strtobool(text: Union[str, bool]):
 
 
 def strtolist(text: Optional[str]) -> List[str]:
-    return LIST_REGEX.split(text or "")
+    return [item.strip() for item in (text or "").split(",")]
