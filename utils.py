@@ -1,4 +1,8 @@
-from typing import Union
+import re
+
+from typing import Union, List
+
+LIST_REGEX = re.compile(r'[\s,]+', re.UNICODE)
 
 
 def strtobool(text: Union[str, bool]):
@@ -9,3 +13,7 @@ def strtobool(text: Union[str, bool]):
         return True
 
     return False
+
+
+def strtolist(text: str) -> List[str]:
+    return LIST_REGEX.findall(text or "")
