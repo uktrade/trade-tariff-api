@@ -1,5 +1,4 @@
 import os
-import re
 
 from utils import LIST_REGEX, strtobool, strtolist
 
