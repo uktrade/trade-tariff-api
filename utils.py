@@ -1,6 +1,6 @@
 import re
 
-from typing import Union, List
+from typing import List, Optional, Union
 
 LIST_REGEX = re.compile(r'[\s,]+', re.UNICODE)
 
@@ -15,5 +15,5 @@ def strtobool(text: Union[str, bool]):
     return False
 
 
-def strtolist(text: str) -> List[str]:
+def strtolist(text: Optional[str]) -> List[str]:
     return LIST_REGEX.findall(text or "")
