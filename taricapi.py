@@ -82,9 +82,11 @@ def get_remoteaddr(request):
     if request.environ.get("HTTP_X_FORWARDED_FOR") is None:
         logger.info("Remote addresses are %s", request.environ["REMOTE_ADDR"])
         remoteaddrs = request.environ["REMOTE_ADDR"].split(",")
+        raise ValueError(f"REMOTE_ADDR addresses are {remoteaddrs}, NUM_PROXIES {NUM_PROXIES}")
     else:
         logger.info("Remote addresses are %s", request.environ["HTTP_X_FORWARDED_FOR"])
         remoteaddrs = request.environ["HTTP_X_FORWARDED_FOR"].split(",")
+        raise ValueError(f"HTTP_X_FORWARDED_FOR addresses are {remoteaddrs}, NUM_PROXIES: {NUM_PROXIES}")
 
     if len(remoteaddrs) > NUM_PROXIES:
         logger.warning("Additional remote addresses stripped (possible spoofing)")
