@@ -54,7 +54,6 @@ from config import (
     GA_ENDPOINT,
 )
 
-
 # Use apifile for file system, apifiles3 for AWS S3
 
 
@@ -85,9 +84,9 @@ def get_remoteaddr(request):
         raise ValueError(f"REMOTE_ADDR addresses are {remoteaddrs}, NUM_PROXIES {NUM_PROXIES}")
     else:
         logger.info("Remote addresses are %s", request.environ["HTTP_X_FORWARDED_FOR"])
+        r_addr = request.environ["REMOTE_ADDR"].split(",")
         remoteaddrs = request.environ["HTTP_X_FORWARDED_FOR"].split(",")
-        raise ValueError(f"HTTP_X_FORWARDED_FOR addresses are {remoteaddrs}, NUM_PROXIES: {NUM_PROXIES}")
-
+        raise ValueError(f"REMOTE_ADDR: {r_addr} HTTP_X_FORWARDED_FOR addresses are {remoteaddrs}, NUM_PROXIES: {NUM_PROXIES}")
     if len(remoteaddrs) > NUM_PROXIES:
         logger.warning("Additional remote addresses stripped (possible spoofing)")
         remoteaddrs = remoteaddrs[-NUM_PROXIES:]
@@ -210,7 +209,7 @@ def create_index_entry(seq):
 
 
 def _send_to_google_analytics(
-    requester_ip, request_host, request_path, request_headers
+        requester_ip, request_host, request_path, request_headers
 ):
     logger.debug('Sending to Google Analytics %s: %s...', request_host, request_path)
     requests.post(
@@ -247,7 +246,7 @@ def rebuild_index(nocheck):
                 # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
                 # TODO - combine with individual update_index..
                 f = file["Key"]
-                f = f[f.rindex("/") + 1 :]  # remove folder prefix
+                f = f[f.rindex("/") + 1:]  # remove folder prefix
                 logger.info("Found file %s", f)
 
                 if f.startswith("TEMP_"):
@@ -322,10 +321,10 @@ def check():
     logger.debug("%s", request.headers)
     logger.debug("%s", request.environ)
     message = (
-        "Request from "
-        + get_apikey(request)
-        + " @ "
-        + " ".join(get_remoteaddr(request))
+            "Request from "
+            + get_apikey(request)
+            + " @ "
+            + " ".join(get_remoteaddr(request))
     )
     return render_template("check.html", message=message)
 
@@ -363,7 +362,6 @@ def hello():
 @app.route("/api/v1/taricdeltas/", defaults={"date": ""}, methods=["GET"])
 @app.route("/api/v1/taricdeltas", defaults={"date": ""}, methods=["GET"])
 def taricdeltas(date):
-
     # Default to yesterday
     if date == "" or date is None:
         yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
@@ -410,7 +408,6 @@ def taricdeltas(date):
 @app.route("/api/v1/taricfiles/<seq>", methods=["GET"])
 @app.route("/api/v1/taricfiles", defaults={"seq": ""}, methods=["GET"])
 def taricfiles(seq):
-
     if not is_auth(request):
         logger.debug("API key not provided or not authorised")
         return Response("403 Unauthorised", status=403)
@@ -439,7 +436,6 @@ def taricfiles(seq):
 @app.route("/api/v1/taricfiles/<seq>", methods=["POST"])
 @app.route("/api/v1/taricfiles", defaults={"seq": ""}, methods=["POST"])
 def taricfiles_upload(seq):
-
     modtime = None
 
     if not is_auth_upload(request):
