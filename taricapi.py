@@ -94,12 +94,15 @@ def get_remoteaddr(request):
 
 
 def in_whitelist(remoteaddrs):
-    for addr in remoteaddrs:
-        for wlip in WHITELIST:
-            logger.debug("%s %s", addr, wlip)
-            if addr in IP(wlip):
-                return True
-    return False
+    # Temporarily disable whitelisting.
+    logger.info("Whitelisting remoteaddrs: %s, ", remoteaddrs)
+    return True
+    # for addr in remoteaddrs:
+    #     for wlip in WHITELIST:
+    #         logger.debug("%s %s", addr, wlip)
+    #         if addr in IP(wlip):
+    #             return True
+    # return False
 
 
 def in_whitelist_upload(remoteaddrs):
