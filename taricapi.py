@@ -17,7 +17,6 @@ from flask import Flask, render_template, make_response, request, Response
 from flask.logging import create_logger
 from gevent.pywsgi import WSGIServer
 import gevent
-from IPy import IP
 from lxml import etree
 import requests
 import sentry_sdk
@@ -40,8 +39,6 @@ from config import (
     API_ROOT,
     APIKEYS,
     APIKEYS_UPLOAD,
-    WHITELIST,
-    WHITELIST_UPLOAD,
     PORT,
     LOGGING,
     NUM_PROXIES,
@@ -54,13 +51,12 @@ from config import (
     GA_ENDPOINT,
 )
 
-
 # Use apifile for file system, apifiles3 for AWS S3
 
 
 dictConfig(LOGGING)
 
-app = Flask(__name__, static_url_path='/static', static_folder='static')
+app = Flask(__name__, static_url_path="/static", static_folder="static")
 logger = create_logger(app)
 
 
@@ -93,55 +89,28 @@ def get_remoteaddr(request):
     return remoteaddrs
 
 
-def in_whitelist(remoteaddrs):
-    for addr in remoteaddrs:
-        for wlip in WHITELIST:
-            logger.debug("%s %s", addr, wlip)
-            if addr in IP(wlip):
-                return True
-    return False
-
-
-def in_whitelist_upload(remoteaddrs):
-    for addr in remoteaddrs:
-        for wlip in WHITELIST_UPLOAD:
-            logger.debug("%s %s", addr, wlip)
-            if addr in IP(wlip):
-                return True
-    return False
-
-
 def in_apikeys(apikey):
-    hashed_apikey = str(hashlib.sha256(apikey.encode("ascii")).hexdigest())
-    try:
-        return hashed_apikey in APIKEYS
-
-    except ValueError:
-        return False
+    hashed_apikey = hashlib.sha256(apikey.encode("ascii")).hexdigest()
+    return hashed_apikey in APIKEYS
 
 
 def in_apikeys_upload(apikey):
     hashed_apikey = hashlib.sha256(apikey.encode("ascii")).hexdigest()
-    try:
-        return hashed_apikey in APIKEYS_UPLOAD
-    except ValueError:
-        return False
+    return hashed_apikey in APIKEYS_UPLOAD
 
 
 def is_auth(request):
-    if REQUIRE_AUTH_FOR_READS:
-        apikey = get_apikey(request)
-        remoteaddr = get_remoteaddr(request)
-        return in_apikeys(apikey) and in_whitelist(remoteaddr)
+    if not REQUIRE_AUTH_FOR_READS:
+        return True
 
-    return True
+    apikey = get_apikey(request)
+    return in_apikeys(apikey)
 
 
 def is_auth_upload(request):
     apikey = get_apikey(request)
-    remoteaddrs = get_remoteaddr(request)
 
-    return in_apikeys_upload(apikey) and in_whitelist_upload(remoteaddrs)
+    return in_apikeys_upload(apikey)
 
 
 # ---------------------------
@@ -210,20 +179,20 @@ def create_index_entry(seq):
 def _send_to_google_analytics(
     requester_ip, request_host, request_path, request_headers
 ):
-    logger.debug('Sending to Google Analytics %s: %s...', request_host, request_path)
+    logger.debug("Sending to Google Analytics %s: %s...", request_host, request_path)
     requests.post(
         GA_ENDPOINT,
         data={
-            'v': '1',
-            'tid': GA_TRACKING_ID,
-            'cid': str(uuid.uuid4()),
-            't': 'pageview',
-            'uip': requester_ip,
-            'dh': request_host,
-            'dp': request_path,
-            'ds': 'public-tariffs-api',
-            'dr': request_headers.get('referer', ''),
-            'ua': request_headers.get('user-agent', ''),
+            "v": "1",
+            "tid": GA_TRACKING_ID,
+            "cid": str(uuid.uuid4()),
+            "t": "pageview",
+            "uip": requester_ip,
+            "dh": request_host,
+            "dp": request_path,
+            "ds": "public-tariffs-api",
+            "dr": request_headers.get("referer", ""),
+            "ua": request_headers.get("user-agent", ""),
         },
     )
     logger.info("sent to ga")
@@ -361,7 +330,6 @@ def hello():
 @app.route("/api/v1/taricdeltas/", defaults={"date": ""}, methods=["GET"])
 @app.route("/api/v1/taricdeltas", defaults={"date": ""}, methods=["GET"])
 def taricdeltas(date):
-
     # Default to yesterday
     if date == "" or date is None:
         yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
@@ -408,7 +376,6 @@ def taricdeltas(date):
 @app.route("/api/v1/taricfiles/<seq>", methods=["GET"])
 @app.route("/api/v1/taricfiles", defaults={"seq": ""}, methods=["GET"])
 def taricfiles(seq):
-
     if not is_auth(request):
         logger.debug("API key not provided or not authorised")
         return Response("403 Unauthorised", status=403)
@@ -437,7 +404,6 @@ def taricfiles(seq):
 @app.route("/api/v1/taricfiles/<seq>", methods=["POST"])
 @app.route("/api/v1/taricfiles", defaults={"seq": ""}, methods=["POST"])
 def taricfiles_upload(seq):
-
     modtime = None
 
     if not is_auth_upload(request):
@@ -508,9 +474,9 @@ def get_server():
 
     @app.after_request
     def add_x_robots(response):  # pylint: disable=W0612
-        response.headers['X-Robots-Tag'] = 'noindex, nofollow'
+        response.headers["X-Robots-Tag"] = "noindex, nofollow"
         response.headers[
-            'Strict-Transport-Security'
+            "Strict-Transport-Security"
         ] = "max-age=31536000; includeSubDomains"
 
         if GA_TRACKING_ID:
@@ -528,17 +494,17 @@ def get_server():
     elastic_apm_secret_token = ELASTIC_APM_TOKEN
     elastic_apm = (
         {
-            'SERVICE_NAME': 'public-tariffs-api',
-            'SECRET_TOKEN': elastic_apm_secret_token,
-            'SERVER_URL': elastic_apm_url,
-            'ENVIRONMENT': ENVIRONMENT,
+            "SERVICE_NAME": "public-tariffs-api",
+            "SECRET_TOKEN": elastic_apm_secret_token,
+            "SERVER_URL": elastic_apm_url,
+            "ENVIRONMENT": ENVIRONMENT,
         }
         if elastic_apm_url and elastic_apm_secret_token
         else {}
     )
 
     if elastic_apm:
-        app.config['ELASTIC_APM'] = elastic_apm
+        app.config["ELASTIC_APM"] = elastic_apm
         ElasticAPM(app)
 
     server = WSGIServer(("0.0.0.0", PORT), app, log=app.logger)

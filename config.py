@@ -2,7 +2,7 @@ import os
 
 from utils import strtobool, strtolist
 
-ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 PORT = int(os.environ.get("PORT", 8080))
 
 AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
@@ -13,8 +13,6 @@ API_ROOT = os.environ.get("API_ROOT", "http://localhost:8080/api/v1/")
 
 APIKEYS = strtolist(os.environ.get("APIKEYS"))
 APIKEYS_UPLOAD = strtolist(os.environ.get("APIKEYS_UPLOAD"))
-WHITELIST = strtolist(os.environ.get("WHITELIST"))
-WHITELIST_UPLOAD = strtolist(os.environ.get("WHITELIST_UPLOAD"))
 
 TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
 TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
@@ -43,11 +41,11 @@ S3_ENDPOINT_URL = os.environ.get("S3_ENDPOINT_URL", None)
 NUM_PROXIES = int(os.environ.get("NUM_PROXIES", 0))
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
 
-REQUIRE_AUTH_FOR_READS = strtobool(os.environ.get('REQUIRE_AUTH_FOR_READS', 'true'))
+REQUIRE_AUTH_FOR_READS = strtobool(os.environ.get("REQUIRE_AUTH_FOR_READS", "true"))
 
-ELASTIC_APM_URL = os.environ.get('ELASTIC_APM_URL', None)
-ELASTIC_APM_TOKEN = os.environ.get('ELASTIC_APM_TOKEN', None)
+ELASTIC_APM_URL = os.environ.get("ELASTIC_APM_URL", None)
+ELASTIC_APM_TOKEN = os.environ.get("ELASTIC_APM_TOKEN", None)
 
 
-GA_TRACKING_ID = os.environ.get('GA_TRACKING_ID', None)
-GA_ENDPOINT = os.environ.get('GA_ENDPOINT', 'https://www.google-analytics.com/collect')
+GA_TRACKING_ID = os.environ.get("GA_TRACKING_ID", None)
+GA_ENDPOINT = os.environ.get("GA_ENDPOINT", "https://www.google-analytics.com/collect")
