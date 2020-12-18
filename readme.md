@@ -63,7 +63,7 @@ curl --form file=@/users/dave/downloads/Taric3_files/TGB18146.xml -H "X-API-KEY:
 
 The API is readable publicly without authentication.
 
-An API key (`X-API-KEY`) is required to upload new files. Access to the upload API endpoint is restricted to a set of whitelisted IPs both by the app and by an IP filtering route service.
+An API key (`X-API-KEY`) is required to upload new files.
 
 
 # Installation
@@ -76,9 +76,7 @@ API_ROOT            | URL prefix for serving files
 TARIC_FILES_FOLDER  | Location for Taric files (defaults to /)
 TARIC_FILES_INDEX   | Location of index file (defaults to /)
 API_KEYS            | Comma separated list of API keys that are SHA256 encoded
-WHITELIST           | Comma separated list of whitelisted source IP addresses **
 APIKEYS_UPLOAD      | Same as API_KEYS above - except these are the keys authorised to upload Taric files
-WHITELIST_UPLOAD    | Same as WHITELIST above - except these are the IP addresses whitelisted to upload Taric files
 AWS_BUCKET_NAME     | S3 bucket storing the Taric files ***
 AWS_ACCESS_KEY_ID   | S3 Access key
 AWS_SECRET_ACCESS_KEY   | S3 Secret
