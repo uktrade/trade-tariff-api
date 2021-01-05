@@ -515,7 +515,8 @@ def get_server():
 
 @click.command()
 def serve():
-    # For backwards compatibility, run the webserver by default.
+    """Run webserver.
+    """
     rebuild_index(False)
     server = get_server()
 
@@ -546,6 +547,7 @@ def ls():
 
 @click.command()
 def index():
+    """Rebuild file index."""
     rebuild_index(False)
 
 
@@ -570,6 +572,7 @@ def cli():
 
 
 if __name__ == "__main__":
+    # Setup maintenance commands.
     cli.add_command(rmdelta)
     cli.add_command(ls)
     cli.add_command(serve)
