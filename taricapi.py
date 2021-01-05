@@ -2,6 +2,7 @@ from gevent import monkey  # noqa: E402  #  pylint: disable=C0411, C0412, C0413
 
 monkey.patch_all()  # noqa: E402  # pylint: disable=C0411, C0413
 
+import click
 import datetime
 import hashlib
 import io
@@ -177,7 +178,7 @@ def create_index_entry(seq):
 
 
 def _send_to_google_analytics(
-    requester_ip, request_host, request_path, request_headers
+        requester_ip, request_host, request_path, request_headers
 ):
     logger.debug("Sending to Google Analytics %s: %s...", request_host, request_path)
     requests.post(
@@ -214,7 +215,7 @@ def rebuild_index(nocheck):
                 # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
                 # TODO - combine with individual update_index..
                 f = file["Key"]
-                f = f[f.rindex("/") + 1 :]  # remove folder prefix
+                f = f[f.rindex("/") + 1:]  # remove folder prefix
                 logger.info("Found file %s", f)
 
                 if f.startswith("TEMP_"):
@@ -289,10 +290,10 @@ def check():
     logger.debug("%s", request.headers)
     logger.debug("%s", request.environ)
     message = (
-        "Request from "
-        + get_apikey(request)
-        + " @ "
-        + " ".join(get_remoteaddr(request))
+            "Request from "
+            + get_apikey(request)
+            + " @ "
+            + " ".join(get_remoteaddr(request))
     )
     return render_template("check.html", message=message)
 
@@ -512,10 +513,13 @@ def get_server():
     return server
 
 
-def main():
+@click.command()
+def serve():
+    # For backwards compatibility, run the webserver by default.
     rebuild_index(False)
     server = get_server()
 
+    # TODO - is this supposed to hook SIGTERM twice - if so document why.
     gevent.signal_handler(signal.SIGTERM, server.stop)
     gevent.signal_handler(signal.SIGTERM, server.stop)
 
@@ -523,5 +527,30 @@ def main():
     gevent.get_hub().join()
 
 
+@click.command()
+def reindex():
+    rebuild_index(False)
+
+
+@click.command()
+def delete():
+    click.echo("delete")
+    rebuild_index(False)
+
+
+@click.group(no_args_is_help=False, invoke_without_command=True)
+@click.pass_context
+def cli(ctx):
+    import ipdb;
+    ipdb.set_trace()
+    # For backwards compatiblity, default is to run the webserver.
+    # if not ctx.command.commands:
+    if not ctx.obj:
+        serve()
+
+
 if __name__ == "__main__":
-    main()
+    cli.add_command(delete)
+    cli.add_command(serve)
+    cli.add_command(reindex)
+    cli()
