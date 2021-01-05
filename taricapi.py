@@ -10,6 +10,7 @@ import json
 from logging.config import dictConfig
 import re
 import signal
+import sys
 import threading
 import uuid
 
@@ -24,6 +25,7 @@ import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 from apifiles3 import write_file
+from apifiles3 import remove_taric_file
 from apifiles3 import remove_temp_taric_file
 from apifiles3 import rename_taric_file
 from apifiles3 import save_temp_taric_file
@@ -203,39 +205,35 @@ def _send_to_google_analytics(
 # Rebuild master file index (JSON)
 # --------------------------------
 def rebuild_index(nocheck):
-    def _rebuild_index():
-        if not file_exists(get_taric_index_file()) or nocheck:
-            logger.info("*** Rebuilding file index... ***")
-            all_deltas = []
+    if not file_exists(get_taric_index_file()) or nocheck:
+        logger.info("*** Rebuilding file index... ***")
+        all_deltas = []
 
-            files = get_file_list(None)
-            logger.info("%s", files)
-            for file in files:
-                # build entry for file just uploaded
-                # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
-                # TODO - combine with individual update_index..
-                f = file["Key"]
-                f = f[f.rindex("/") + 1:]  # remove folder prefix
-                logger.info("Found file %s", f)
+        files = get_file_list(None)
+        logger.info("%s", files)
+        for file in files:
+            # build entry for file just uploaded
+            # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
+            # TODO - combine with individual update_index..
+            f = file["Key"]
+            f = f[f.rindex("/") + 1:]  # remove folder prefix
+            logger.info("Found file %s", f)
 
-                if f.startswith("TEMP_"):
-                    logger.info("Removing temporary file %s", f)
-                    seq = f[5:-4]  # remove TEMP_ file prefix and .xml extension
-                    remove_temp_taric_file(seq)
-                else:
-                    if is_valid_seq(f[:-4]):  # ignore non taric files
-                        seq = f[:-4]  # remove .xml extension
-                        all_deltas.append(create_index_entry(seq))
+            if f.startswith("TEMP_"):
+                logger.info("Removing temporary file %s", f)
+                seq = f[5:-4]  # remove TEMP_ file prefix and .xml extension
+                remove_temp_taric_file(seq)
+            else:
+                if is_valid_seq(f[:-4]):  # ignore non taric files
+                    seq = f[:-4]  # remove .xml extension
+                    all_deltas.append(create_index_entry(seq))
 
-            logger.debug("%s delta files listed after update", str(len(all_deltas)))
+        logger.debug("%s delta files listed after update", str(len(all_deltas)))
 
-            # persist updated index
-            all_deltass = json.dumps(all_deltas)
-            write_file(get_taric_index_file(), all_deltass)
-            logger.info("Index rebuild complete")
-
-    logger.debug("Starting thread to rebuild index.")
-    threading.Thread(target=_rebuild_index).start()
+        # persist updated index
+        all_deltass = json.dumps(all_deltas)
+        write_file(get_taric_index_file(), all_deltass)
+        logger.info("Index rebuild complete")
 
 
 @app.route("/api/v1/rebuildindex", methods=["POST"])
@@ -244,7 +242,9 @@ def rebuild_index_controller():
         logger.info("API key not provided or not authorised")
         return Response("403 Unauthorised", status=403)
 
-    rebuild_index(True)
+    logger.debug("Starting thread to rebuild index.")
+    threading.Thread(target=rebuild_index, args=[True]).start()
+
     return Response("202 index is being rebuilt", status=202)
 
 
@@ -519,7 +519,7 @@ def serve():
     rebuild_index(False)
     server = get_server()
 
-    # TODO - is this supposed to hook SIGTERM twice - if so document why.
+    # TODO - is this supposed to hook SIGTERM twice? - if so document why.
     gevent.signal_handler(signal.SIGTERM, server.stop)
     gevent.signal_handler(signal.SIGTERM, server.stop)
 
@@ -528,29 +528,50 @@ def serve():
 
 
 @click.command()
-def reindex():
-    rebuild_index(False)
+def ls():
+    """List delta, temporary and other files.
+    """
+    for f in get_file_list():
+        # File identification logic taken from rebuild_index
+        if f.startswith("TEMP_"):
+            seq = f[5:-4]  # remove TEMP_ file prefix and .xml extension
+            click.echo("TEMP   {seq}  {filename}".format(seq=seq, filename=f))
+        else:
+            if is_valid_seq(f[:-4]):  # ignore non taric files
+                seq = f[:-4]
+                click.echo("DELTA  {seq}  {filename}".format(seq=seq, filename=f))
+            else:
+                click.echo("MISC         {filename}".format(filename=f))
 
 
 @click.command()
-def delete():
-    click.echo("delete")
+def index():
+    rebuild_index(False)
+
+
+@click.command(help='Delta sequence number [6 digits].')
+@click.argument('seq')
+def rmdelta(seq):
+    """Remove delta file for sequence.
+    """
+    if not is_valid_seq(seq):
+        click.echo("{seq} digita should be 6 digit numbers.".format(seq=seq))
+        return
+
+    remove_taric_file(seq)
     rebuild_index(False)
 
 
 @click.group(no_args_is_help=False, invoke_without_command=True)
-@click.pass_context
-def cli(ctx):
-    import ipdb;
-    ipdb.set_trace()
-    # For backwards compatiblity, default is to run the webserver.
-    # if not ctx.command.commands:
-    if not ctx.obj:
+def cli():
+    if not sys.argv[1:]:
+        # For backwards compatibility, default is to run the webserver.
         serve()
 
 
 if __name__ == "__main__":
-    cli.add_command(delete)
+    cli.add_command(rmdelta)
+    cli.add_command(ls)
     cli.add_command(serve)
-    cli.add_command(reindex)
+    cli.add_command(index)
     cli()

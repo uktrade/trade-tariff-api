@@ -198,6 +198,15 @@ def remove_temp_taric_file(seq):
     session().delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
 
 
+def remove_taric_file(seq):
+    """In ordinary operation taric files are not removed, but occasionally
+    this is required.
+    """
+    filename = get_taric_filepath(seq)
+    logger.debug("Removing file %s", filename)
+    session().delete_object(Bucket=AWS_BUCKET_NAME, Key=filename)
+
+
 def rename_file(fromname, toname):
     # AWS S3 has no rename - have to copy & delete
     logger.debug("Renaming file from %s to %s", fromname, toname)
