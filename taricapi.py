@@ -14,6 +14,7 @@ import sys
 import threading
 import uuid
 
+from botocore.exceptions import ClientError
 from elasticapm.contrib.flask import ElasticAPM
 from flask import Flask, render_template, make_response, request, Response
 from flask.logging import create_logger
@@ -395,6 +396,32 @@ def taricfiles(seq):
         mimetype="text/xml",
         headers={"Content-Length": get_file_size(get_taric_filepath(seq))},
     )
+
+
+# -----------------------------------------
+# API to remove contents of specific file
+# -----------------------------------------
+@app.route("/api/v1/taricfiles/<seq>", methods=["DELETE"])
+@app.route("/api/v1/taricfiles", defaults={"seq": ""}, methods=["DELETE"])
+def taricfiles(seq):
+    if not is_auth_upload(request):
+        logger.debug("API key not provided or not authorised")
+        return Response("403 Unauthorised", status=403)
+
+    if not is_valid_seq(seq):
+        logger.debug("seq is invalid")
+        return Response("400 Bad request [invalid seq]", status=400)
+
+    logger.info("attempt to remove taric file %s", seq)
+    try:
+        remove_taric_file(seq)
+    except ClientError as e:
+        return Response("400 Error %s" % e['Error']['Code'], status=200)
+
+    logger.debug("Starting thread to rebuild index.")
+    threading.Thread(target=rebuild_index, args=[True]).start()
+
+    return Response("200 OK File deleted, reindexing", status=200)
 
 
 # --------------------------------------------------------------------
