@@ -403,7 +403,7 @@ def taricfiles(seq):
 # -----------------------------------------
 @app.route("/api/v1/taricfiles/<seq>", methods=["DELETE"])
 @app.route("/api/v1/taricfiles", defaults={"seq": ""}, methods=["DELETE"])
-def taricfiles(seq):
+def taricfiles_delete(seq):
     if not is_auth_upload(request):
         logger.debug("API key not provided or not authorised")
         return Response("403 Unauthorised", status=403)
