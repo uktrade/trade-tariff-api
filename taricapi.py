@@ -181,7 +181,7 @@ def create_index_entry(seq):
 
 
 def _send_to_google_analytics(
-        requester_ip, request_host, request_path, request_headers
+    requester_ip, request_host, request_path, request_headers
 ):
     logger.debug("Sending to Google Analytics %s: %s...", request_host, request_path)
     requests.post(
@@ -217,7 +217,7 @@ def rebuild_index(nocheck):
             # TODO (possibly) Add Metadata generation -> then could have api /taricfilemd/...
             # TODO - combine with individual update_index..
             f = file["Key"]
-            f = f[f.rindex("/") + 1:]  # remove folder prefix
+            f = f[f.rindex("/") + 1 :]  # remove folder prefix
             logger.info("Found file %s", f)
 
             if f.startswith("TEMP_"):
@@ -291,10 +291,10 @@ def check():
     logger.debug("%s", request.headers)
     logger.debug("%s", request.environ)
     message = (
-            "Request from "
-            + get_apikey(request)
-            + " @ "
-            + " ".join(get_remoteaddr(request))
+        "Request from "
+        + get_apikey(request)
+        + " @ "
+        + " ".join(get_remoteaddr(request))
     )
     return render_template("check.html", message=message)
 
@@ -416,7 +416,7 @@ def taricfiles_delete(seq):
     try:
         remove_taric_file(seq)
     except ClientError as e:
-        return Response("400 Error %s" % e['Error']['Code'], status=200)
+        return Response("400 Error %s" % e["Error"]["Code"], status=200)
 
     logger.debug("Starting thread to rebuild index.")
     threading.Thread(target=rebuild_index, args=[True]).start()
@@ -578,8 +578,8 @@ def index():
     rebuild_index(False)
 
 
-@click.command(help='Delta sequence number [6 digits].')
-@click.argument('seq')
+@click.command(help="Delta sequence number [6 digits].")
+@click.argument("seq")
 def rmdelta(seq):
     """Remove delta file for sequence.
     """
