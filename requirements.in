@@ -9,6 +9,6 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 lxml==4.6.3
 MarkupSafe==1.1.0
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 sentry-sdk[flask]==0.19.4
 requests==2.25.0
