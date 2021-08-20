@@ -52,12 +52,12 @@ elastic-apm[flask]==5.10.0
     # via -r requirements.txt
 entrypoints==0.3
     # via flake8
-flake8-bugbear==20.1.4
-    # via -r requirements-dev.in
 flake8==3.7.9
     # via
     #   -r requirements-dev.in
     #   flake8-bugbear
+flake8-bugbear==20.1.4
+    # via -r requirements-dev.in
 flask==1.0.2
     # via
     #   -r requirements.txt
@@ -80,7 +80,7 @@ itsdangerous==1.1.0
     # via
     #   -r requirements.txt
     #   flask
-jinja2==2.10.1
+jinja2==2.11.3
     # via
     #   -r requirements.txt
     #   flask
