@@ -36,10 +36,6 @@ test "No API KEY -> expect 403"
 out=$(curl -s -w "%{http_code}" -o /dev/null $APIURLLIST)
 assert "403" "$out"
 
-test "API KEY but additional / spoofed IP -> expect 403"
-out=$(curl -s -i -H "X-API-KEY: abc123" -H "X-Forwarded-For: 1.2.3.4, 1.2.3.5, 127.0.0.1" -w "%{http_code}" -o /dev/null $APIURLLIST)
-assert "403" "$out"
-
 test "Invalid date parameter -> expect 400"
 out=$(curl -s -i -H "X-API-KEY: abc123" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" -w "%{http_code}" -o /dev/null $APIURLLIST/invaliddate)
 assert "400" "$out"
