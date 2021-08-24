@@ -4,160 +4,53 @@
 #
 #    pip-compile requirements-dev.in
 #
-appdirs==1.4.4
-    # via black
-astroid==2.4.2
-    # via pylint
-attrs==20.3.0
-    # via
-    #   black
-    #   flake8-bugbear
-black==19.10b0
-    # via -r requirements-dev.in
-blinker==1.4
-    # via
-    #   -r requirements.txt
-    #   elastic-apm
-    #   sentry-sdk
-boto3==1.9.62
-    # via -r requirements.txt
-botocore==1.12.253
-    # via
-    #   -r requirements.txt
-    #   boto3
-    #   s3transfer
-certifi==2020.11.8
-    # via
-    #   -r requirements.txt
-    #   elastic-apm
-    #   requests
-    #   sentry-sdk
-chardet==3.0.4
-    # via
-    #   -r requirements.txt
-    #   requests
-click==7.0
-    # via
-    #   -r requirements.txt
-    #   black
-    #   flask
-    #   pip-tools
-docutils==0.15.2
-    # via
-    #   -r requirements.txt
-    #   botocore
-ecs-logging==0.5.0
-    # via -r requirements.txt
-elastic-apm[flask]==5.10.0
-    # via -r requirements.txt
-entrypoints==0.3
-    # via flake8
-flake8==3.7.9
-    # via
-    #   -r requirements-dev.in
-    #   flake8-bugbear
-flake8-bugbear==20.1.4
-    # via -r requirements-dev.in
-flask==1.0.2
-    # via
-    #   -r requirements.txt
-    #   sentry-sdk
-gevent==20.9.0
-    # via -r requirements.txt
-greenlet==0.4.17
-    # via
-    #   -r requirements.txt
-    #   gevent
-idna==2.10
-    # via
-    #   -r requirements.txt
-    #   requests
-ipy==0.83
-    # via -r requirements.txt
-isort==4.3.21
-    # via pylint
-itsdangerous==1.1.0
-    # via
-    #   -r requirements.txt
-    #   flask
-jinja2==2.11.3
-    # via
-    #   -r requirements.txt
-    #   flask
-jmespath==0.10.0
-    # via
-    #   -r requirements.txt
-    #   boto3
-    #   botocore
-lazy-object-proxy==1.4.3
-    # via astroid
-lxml==4.6.3
-    # via -r requirements.txt
-markupsafe==1.1.0
-    # via
-    #   -r requirements.txt
-    #   jinja2
-mccabe==0.6.1
-    # via
-    #   flake8
-    #   pylint
-pathspec==0.8.1
-    # via black
-pip-tools==5.4.0
-    # via -r requirements-dev.in
-pycodestyle==2.5.0
-    # via flake8
-pyflakes==2.1.1
-    # via flake8
-pylint==2.5.3
-    # via -r requirements-dev.in
-python-dateutil==2.8.1
-    # via
-    #   -r requirements.txt
-    #   botocore
-regex==2020.11.13
-    # via black
-requests==2.25.0
-    # via -r requirements.txt
-s3transfer==0.1.13
-    # via
-    #   -r requirements.txt
-    #   boto3
-sentry-sdk[flask]==0.19.4
-    # via -r requirements.txt
-six==1.15.0
-    # via
-    #   -r requirements.txt
-    #   astroid
-    #   pip-tools
-    #   python-dateutil
-toml==0.10.2
-    # via
-    #   black
-    #   pylint
-typed-ast==1.4.1
-    # via black
-urllib3==1.25.11
-    # via
-    #   -r requirements.txt
-    #   botocore
-    #   elastic-apm
-    #   requests
-    #   sentry-sdk
-werkzeug==0.15.3
-    # via
-    #   -r requirements.txt
-    #   flask
-wrapt==1.12.1
-    # via astroid
-zope.event==4.5.0
-    # via
-    #   -r requirements.txt
-    #   gevent
-zope.interface==5.2.0
-    # via
-    #   -r requirements.txt
-    #   gevent
+appdirs==1.4.4            # via black
+astroid==2.4.2            # via pylint
+attrs==20.3.0             # via black, flake8-bugbear
+black==19.10b0            # via -r requirements-dev.in
+blinker==1.4              # via -r requirements.txt, elastic-apm, sentry-sdk
+boto3==1.9.62             # via -r requirements.txt
+botocore==1.12.253        # via -r requirements.txt, boto3, s3transfer
+certifi==2020.11.8        # via -r requirements.txt, elastic-apm, requests, sentry-sdk
+chardet==3.0.4            # via -r requirements.txt, requests
+click==7.0                # via -r requirements.txt, black, flask, pip-tools
+docutils==0.15.2          # via -r requirements.txt, botocore
+ecs-logging==0.5.0        # via -r requirements.txt
+elastic-apm[flask]==5.10.0  # via -r requirements.txt
+entrypoints==0.3          # via flake8
+flake8-bugbear==20.1.4    # via -r requirements-dev.in
+flake8==3.7.9             # via -r requirements-dev.in, flake8-bugbear
+flask==1.0.2              # via -r requirements.txt, sentry-sdk
+gevent==20.9.0            # via -r requirements.txt
+greenlet==0.4.17          # via -r requirements.txt, gevent
+idna==2.10                # via -r requirements.txt, requests
+ipy==0.83                 # via -r requirements.txt
+isort==4.3.21             # via pylint
+itsdangerous==1.1.0       # via -r requirements.txt, flask
+jinja2==2.11.3            # via -r requirements.txt, flask
+jmespath==0.10.0          # via -r requirements.txt, boto3, botocore
+lazy-object-proxy==1.4.3  # via astroid
+lxml==4.6.3               # via -r requirements.txt
+markupsafe==1.1.0         # via -r requirements.txt, jinja2
+mccabe==0.6.1             # via flake8, pylint
+pathspec==0.8.1           # via black
+pip-tools==5.4.0          # via -r requirements-dev.in
+pycodestyle==2.5.0        # via flake8
+pyflakes==2.1.1           # via flake8
+pylint==2.5.3             # via -r requirements-dev.in
+python-dateutil==2.8.1    # via -r requirements.txt, botocore
+regex==2020.11.13         # via black
+requests==2.25.0          # via -r requirements.txt
+s3transfer==0.1.13        # via -r requirements.txt, boto3
+sentry-sdk[flask]==0.19.4  # via -r requirements.txt
+six==1.15.0               # via -r requirements.txt, astroid, pip-tools, python-dateutil
+toml==0.10.2              # via black, pylint
+typed-ast==1.4.1          # via black
+urllib3==1.25.11          # via -r requirements.txt, botocore, elastic-apm, requests, sentry-sdk
+werkzeug==0.15.5          # via -r requirements.txt, flask
+wrapt==1.12.1             # via astroid
+zope.event==4.5.0         # via -r requirements.txt, gevent
+zope.interface==5.2.0     # via -r requirements.txt, gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
