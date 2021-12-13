@@ -7,7 +7,7 @@ gevent==20.9.0
 IPy==0.83
 itsdangerous==1.1.0
 Jinja2==2.11.3
-lxml==4.6.3
+lxml==4.6.5
 MarkupSafe==1.1.0
 Werkzeug==0.15.5
 sentry-sdk[flask]==0.19.4
