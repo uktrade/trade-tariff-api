@@ -1,0 +1,36 @@
+version: '3'
+services:
+  tariff-api-s3:
+    image: minio/minio
+    restart: always
+    ports:
+      - "9004:9004"
+    volumes:
+      - tariff-api-s3-volume:/data
+    environment:
+      MINIO_ACCESS_KEY: "minio_access_key"
+      MINIO_SECRET_KEY: "minio_secret_key"
+    entrypoint: sh
+    command: -c "mkdir -p /data/tariff-api-bucket && minio server --quiet --address 0.0.0.0:9004 /data"
+
+  tariff-api:
+    build: .
+    image: tamato
+    ports:
+      - "8080:8080"
+    depends_on:
+      - tariff-api-s3
+    links:
+      - tariff-api-s3
+    environment:
+      ENVIRONMENT: "development"
+      PORT: "8080"
+      AWS_ACCESS_KEY_ID: "minio_access_key"
+      AWS_SECRET_ACCESS_KEY: "minio_secret_key"
+      S3_ENDPOINT_URL: "http://tariff-api-s3:9004"
+      AWS_BUCKET_NAME: "tariff-api-bucket"
+      PYTHONUNBUFFERED: "1"
+    command: python taricapi.py
+
+volumes:
+  tariff-api-s3-volume:
