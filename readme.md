@@ -127,6 +127,19 @@ The strategy is to use a Unix shell script and curl commands, compare the respon
 
 `tests/testserver.sh` is a sample script to start a server locally with environment variables. `tests/start-minio.sh` and `tests/stop-minio.sh` control a MinIO server that is used for providing an S3-compliant backend for the API during tests.
 
+You may wish to perform direct manual test against the application's endpoints
+upon deploying to either of the
+[staging](https://tariffs-api-staging.london.cloudapps.digital/) or
+[production](https://tariffs.api.trade.gov.uk/) environments. Example `curl`s
+against staging (replace `<api_key> with appropropriate values from the secrets store):
+
+    curl -H "X-API-KEY: <api_key>" https://tariffs-api-staging.london.cloudapps.digital/api/v1/taricfiles/200003
+
+    curl -H "X-API-KEY: <api_key>" --form file=@../migration/DIT210046.xml https://tariffs-api-staging.london.cloudapps.digital/api/v1/taricfiles/210046
+
+    curl -H "X-API-KEY: <api_key>" -X POST https://tariffs-api-staging.london.cloudapps.digital/api/v1/rebuildindex
+
+
 # Further detail
 
 The complete API specification is documented and available in a separate word document.

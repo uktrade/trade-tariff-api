@@ -30,7 +30,7 @@ itsdangerous==1.1.0       # via -r requirements.txt, flask
 jinja2==2.11.3            # via -r requirements.txt, flask
 jmespath==0.10.0          # via -r requirements.txt, boto3, botocore
 lazy-object-proxy==1.4.3  # via astroid
-lxml==4.6.3               # via -r requirements.txt
+lxml==4.6.5               # via -r requirements.txt
 markupsafe==1.1.0         # via -r requirements.txt, jinja2
 mccabe==0.6.1             # via flake8, pylint
 pathspec==0.8.1           # via black
