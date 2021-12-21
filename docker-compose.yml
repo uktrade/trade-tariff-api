@@ -15,7 +15,7 @@ services:
 
   tariff-api:
     build: .
-    image: tamato
+    image: tariff-api
     ports:
       - "8080:8080"
     depends_on:
@@ -27,8 +27,16 @@ services:
       PORT: "8080"
       AWS_ACCESS_KEY_ID: "minio_access_key"
       AWS_SECRET_ACCESS_KEY: "minio_secret_key"
-      S3_ENDPOINT_URL: "http://tariff-api-s3:9004"
       AWS_BUCKET_NAME: "tariff-api-bucket"
+      S3_ENDPOINT_URL: "http://tariff-api-s3:9004"
+      # abc123, def456
+      APIKEYS: "6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090,
+8f61ad5cfa0c471c8cbf810ea285cb1e5f9c2c5e5e5e4f58a3229667703e1587"
+      # def456
+      APIKEYS_UPLOAD: "8f61ad5cfa0c471c8cbf810ea285cb1e5f9c2c5e5e5e4f58a3229667703e1587"
+      WHITELIST: 1.2.3.4
+      WHITELIST_UPLOAD: 1.2.3.4
+      NUM_PROXIES: 2
       PYTHONUNBUFFERED: "1"
     command: python taricapi.py
 

@@ -1,5 +1,12 @@
 FROM python:3.9
 
+ENV WHITELIST ${WHITELIST}
+ENV WHITELIST_UPLOAD ${WHITELIST_UPLOAD}
+
+RUN \
+ apt-get update -y && \
+ apt-get install -y iproute2
+
 # Create app directory
 WORKDIR /app
 
@@ -11,4 +18,6 @@ RUN pip install \
     -r requirements.txt
 
 EXPOSE 8080
-CMD [ "python", "taricapi.py" ]
+
+CMD /bin/s -c source docker-helpers/whitelist-host-ips \
+    python taricapi.py
