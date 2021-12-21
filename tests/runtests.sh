@@ -1,5 +1,17 @@
 #!/bin/bash
 
+#set -euo pipefail
+#IFS=$'\n\t'
+
+# Total seconds to wait until server comes up.
+TTF_TEST_INITIAL_DELAY=${TTF_TEST_INITIAL_DELAY:-30}
+
+# Server URL
+TTF_TEST_URL="${TTF_TEST_URL:-localhost:8080}"
+
+APIURLLIST="${TTF_TEST_URL}/api/v1/taricdeltas"
+APIURLFILE="${TTF_TEST_URL}/api/v1/taricfiles"
+
 typeset -i tests_run=0
 typeset -i tests_passed=0
 
@@ -24,12 +36,9 @@ function assert {
 
 ###############################################################
 
-URL=http://localhost:8080
-APIURLLIST=http://localhost:8080/api/v1/taricdeltas
-APIURLFILE=http://localhost:8080/api/v1/taricfiles
 
 test "Server comes alive within 30 seconds"
-curl --retry 30 --retry-delay 1 --retry-connrefused ${URL} -o /dev/null
+curl --retry ${TTF_TEST_INITIAL_DELAY} --retry-delay 1 --retry-connrefused ${TTF_TEST_URL} -o /dev/null
 assert "0" "$?"
 
 test "No API KEY -> expect 403"
