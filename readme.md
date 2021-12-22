@@ -119,7 +119,22 @@ $ make save-requirements
 
 `pre-commit` is used to help spot problems before committing. Run `pre-commit install --install-hooks` to perform one-off setup of these hooks.
 
-# Testing
+# Testing via docker-compose
+docker-compose.yml and a Dockerfile allow testing a containerised version locally.
+
+    Build the containers:
+    
+    docker-compose build
+    docker-compose up
+    
+This will setup Minio for s3, a container for the tariff-api and another version, tariff-api-test that runs the tests.
+Tests are automatically run, to re-run them, restart the testing container:
+
+    docker-compose restar tariff-api-test
+    
+On making any code changes it will be desirable to rebuild the container.
+
+# Testing locally
 
 The strategy is to use a Unix shell script and curl commands, compare the response codes.
 

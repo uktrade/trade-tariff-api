@@ -1,0 +1,54 @@
+version: '3'
+services:
+  tariff-api-s3:
+    image: minio/minio
+    restart: always
+    ports:
+      - "9004:9004"
+    volumes:
+      - tariff-api-s3-volume:/data
+    environment:
+      MINIO_ACCESS_KEY: "minio_access_key"
+      MINIO_SECRET_KEY: "minio_secret_key"
+    entrypoint: sh
+    command: -c "mkdir -p /data/tariff-api-bucket && minio server --quiet --address 0.0.0.0:9004 /data"
+
+  tariff-api:
+    build: .
+    image: tariff-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - tariff-api-s3
+    links:
+      - tariff-api-s3
+    environment:
+      ENVIRONMENT: "development"
+      PORT: "8080"
+      AWS_ACCESS_KEY_ID: "minio_access_key"
+      AWS_SECRET_ACCESS_KEY: "minio_secret_key"
+      AWS_BUCKET_NAME: "tariff-api-bucket"
+      S3_ENDPOINT_URL: "http://tariff-api-s3:9004"
+      # abc123, def456
+      APIKEYS: "6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090,
+8f61ad5cfa0c471c8cbf810ea285cb1e5f9c2c5e5e5e4f58a3229667703e1587"
+      # def456
+      APIKEYS_UPLOAD: "8f61ad5cfa0c471c8cbf810ea285cb1e5f9c2c5e5e5e4f58a3229667703e1587"
+      WHITELIST: 1.2.3.4
+      WHITELIST_UPLOAD: 1.2.3.4
+      NUM_PROXIES: 2
+      PYTHONUNBUFFERED: "1"
+    command: python taricapi.py
+    
+  tariff-api-test:
+    image: tariff-api
+    command: /app/tests/runtests.sh
+    environment:
+      TTF_TEST_INITIAL_DELAY: 1
+      TTF_TEST_URL: "tariff-api:8080"
+    links:
+      - tariff-api
+      - tariff-api-s3
+      
+volumes:
+  tariff-api-s3-volume:

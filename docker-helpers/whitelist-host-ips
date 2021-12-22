@@ -1,0 +1,4 @@
+# Source this script to add docker host IP to WHITELIST and WHITELIST_UPLOAD
+HOST_IP=$(/sbin/ip route|awk '/default/ { print $3 }')
+WHITELIST=$WHITELIST,$HOST_IP
+WHITELIST_UPLOAD=$WHITELIST_UPLOAD,$HOST_IP
