@@ -50,7 +50,5 @@ services:
       - tariff-api
       - tariff-api-s3
       
-    
-
 volumes:
   tariff-api-s3-volume:

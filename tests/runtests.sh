@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#set -euo pipefail
-#IFS=$'\n\t'
+set -euo pipefail
+IFS=$'\n\t'
 
 # Total seconds to wait until server comes up.
 TTF_TEST_INITIAL_DELAY=${TTF_TEST_INITIAL_DELAY:-30}
