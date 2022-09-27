@@ -21,7 +21,7 @@ blinker==1.4
     #   sentry-sdk
 boto3==1.9.62
     # via -r requirements.txt
-botocore==1.12.253
+botocore==1.20.97
     # via
     #   -r requirements.txt
     #   boto3
@@ -137,7 +137,7 @@ toml==0.10.2
     #   pylint
 typed-ast==1.4.1
     # via black
-urllib3==1.25.11
+urllib3==1.26.5
     # via
     #   -r requirements.txt
     #   botocore
