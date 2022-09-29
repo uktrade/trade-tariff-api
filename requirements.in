@@ -1,4 +1,4 @@
-Boto3==1.9.62
+Boto3==1.17.97
 Click==7.0
 ecs-logging==0.5.0
 elastic-apm[flask]==5.10.0

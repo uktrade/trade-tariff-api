@@ -19,9 +19,9 @@ blinker==1.4
     #   -r requirements.txt
     #   elastic-apm
     #   sentry-sdk
-boto3==1.9.62
+boto3==1.17.97
     # via -r requirements.txt
-botocore==1.12.253
+botocore==1.20.97
     # via
     #   -r requirements.txt
     #   boto3
@@ -119,7 +119,7 @@ regex==2020.11.13
     # via black
 requests==2.25.0
     # via -r requirements.txt
-s3transfer==0.1.13
+s3transfer==0.4.2
     # via
     #   -r requirements.txt
     #   boto3
@@ -137,7 +137,7 @@ toml==0.10.2
     #   pylint
 typed-ast==1.4.1
     # via black
-urllib3==1.25.11
+urllib3==1.26.5
     # via
     #   -r requirements.txt
     #   botocore
