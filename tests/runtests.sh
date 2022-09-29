@@ -69,6 +69,10 @@ test "Non-existent file parameter -> expect 404"
 out=$(curl -s -i -H "X-API-KEY: abc123" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" -w "%{http_code}" -o /dev/null $APIURLFILE/150001)
 assert "404" "$out"
 
+test "Correct file upload -> expect 200"
+out=$(curl -s -i -H "X-API-KEY: def456" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" --form file=@tests/DIT123456.xml -w "%{http_code}" -o /dev/null $APIURLFILE/180251?modtime=2019-02-05T12:00:00.000)
+assert "200" "$out"
+
 test "taricdeltas - All correct -> expect 200"
 out=$(curl -s -i -H "X-API-KEY: abc123" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" -w "%{http_code}" -o /dev/null $APIURLLIST/2019-02-05)
 assert "200" "$out"
@@ -106,11 +110,6 @@ assert "400" "$out"
 test "Invalid file sequence upload -> expect 400"
 out=$(curl -s -i -H "X-API-KEY: def456" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" --form file=@tests/DIT123456.xml -w "%{http_code}" -o /dev/null $APIURLFILE/123)
 assert "400" "$out"
-
-test "Correct file upload -> expect 200"
-out=$(curl -s -i -H "X-API-KEY: def456" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" --form file=@tests/DIT123456.xml -w "%{http_code}" -o /dev/null $APIURLFILE/123456)
-assert "200" "$out"
-
 
 test "Invalid modification time on upload -> expect 400"
 out=$(curl -s -i -H "X-API-KEY: def456" -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1" --form file=@tests/DIT123456.xml -w "%{http_code}" -o /dev/null $APIURLFILE/123456?modtime=123)
