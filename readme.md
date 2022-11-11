@@ -157,4 +157,4 @@ against staging (replace `<api_key> with appropropriate values from the secrets 
 
 # Further detail
 
-The complete API specification is documented and available in a separate word document.
+The complete API specification is documented and available in separate word documentation.
