@@ -26,7 +26,7 @@ botocore==1.20.97
     #   -r requirements.txt
     #   boto3
     #   s3transfer
-certifi==2020.11.8
+certifi==2022.12.7
     # via
     #   -r requirements.txt
     #   elastic-apm
@@ -42,10 +42,6 @@ click==7.0
     #   black
     #   flask
     #   pip-tools
-docutils==0.15.2
-    # via
-    #   -r requirements.txt
-    #   botocore
 ecs-logging==0.5.0
     # via -r requirements.txt
 elastic-apm[flask]==5.10.0
