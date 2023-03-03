@@ -1,6 +1,6 @@
-from gevent import monkey  # noqa: E402
+from gevent import monkey  # noqa: E402  #  pylint: disable=C0411, C0412, C0413
 
-monkey.patch_all()  # noqa: E402
+monkey.patch_all()  # noqa: E402  # pylint: disable=C0411, C0413
 
 import click
 import datetime
