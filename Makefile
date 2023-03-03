@@ -1,6 +1,6 @@
 .PHONY: check-flake8
 check-flake8:
-	flake8 .
+	flake8 --per-file-ignores="taricapi.py:E402" .
 
 .PHONY: check-black
 check-black:

@@ -19,7 +19,6 @@ sid = None
 
 # AWS S3 session
 def session():
-
     # return cached client id
     global sid  # pylint: disable=W0603
     if sid is not None:
@@ -40,6 +39,7 @@ def session():
 # Note these are to provide a level of abstraction
 # - e.g. database or S3 could be physical locations
 # -------------------------------------------------
+
 
 # generic file functions
 def modification_date(filepath):

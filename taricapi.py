@@ -4,11 +4,13 @@ monkey.patch_all()  # noqa: E402  # pylint: disable=C0411, C0413
 
 import click
 import datetime
+import gevent
 import hashlib
 import io
 import json
-from logging.config import dictConfig
 import re
+import requests
+import sentry_sdk
 import signal
 import sys
 import threading
@@ -19,11 +21,9 @@ from elasticapm.contrib.flask import ElasticAPM
 from flask import Flask, render_template, make_response, request, Response
 from flask.logging import create_logger
 from gevent.pywsgi import WSGIServer
-import gevent
-from lxml import etree
-import requests
-import sentry_sdk
+from logging.config import dictConfig
 from sentry_sdk.integrations.flask import FlaskIntegration
+from lxml import etree
 
 from apifiles3 import write_file
 from apifiles3 import remove_taric_file
@@ -497,7 +497,8 @@ def taricfiles_upload(seq):
 def get_server():
     if SENTRY_DSN:
         sentry_sdk.init(
-            dsn=SENTRY_DSN, integrations=[FlaskIntegration()],
+            dsn=SENTRY_DSN,
+            integrations=[FlaskIntegration()],
         )
 
     @app.after_request
@@ -542,8 +543,7 @@ def get_server():
 
 @click.command()
 def serve():
-    """Run webserver.
-    """
+    """Run webserver."""
     rebuild_index(False)
     server = get_server()
 
@@ -557,8 +557,7 @@ def serve():
 
 @click.command()
 def ls():
-    """List delta, temporary and other files.
-    """
+    """List delta, temporary and other files."""
     for f in get_file_list():
         # File identification logic taken from rebuild_index
         if f.startswith("TEMP_"):
@@ -581,8 +580,7 @@ def index():
 @click.command(help="Delta sequence number [6 digits].")
 @click.argument("seq")
 def rmdelta(seq):
-    """Remove delta file for sequence.
-    """
+    """Remove delta file for sequence."""
     if not is_valid_seq(seq):
         click.echo("{seq} digita should be 6 digit numbers.".format(seq=seq))
         return
