@@ -23,6 +23,7 @@ logger = logging.getLogger("taricapi.file")
 # - e.g. database or S3 could be physical locations
 # -------------------------------------------------
 
+
 # generic file functions
 def modification_date(filepath):
     t = os.path.getmtime(filepath)
