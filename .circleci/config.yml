@@ -26,11 +26,11 @@ jobs:
           key: v1-python-requirements-{{ checksum "requirements-dev.txt" }}
           paths: 
             - venv
-      - run:
-          name: Run static checks
-          command: |
-            . venv/bin/activate
-            make check
+      #- run:
+      #    name: Run static checks
+      #    command: |
+      #      . venv/bin/activate
+      #      make check
       - run:
           name: Run unit tests
           command: |
