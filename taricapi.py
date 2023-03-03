@@ -4,11 +4,13 @@ monkey.patch_all()  # noqa: E402  # pylint: disable=C0411, C0413
 
 import click
 import datetime
+import gevent
 import hashlib
 import io
 import json
-from logging.config import dictConfig
 import re
+import requests
+import sentry_sdk
 import signal
 import sys
 import threading
@@ -19,11 +21,9 @@ from elasticapm.contrib.flask import ElasticAPM
 from flask import Flask, render_template, make_response, request, Response
 from flask.logging import create_logger
 from gevent.pywsgi import WSGIServer
-import gevent
-from lxml import etree
-import requests
-import sentry_sdk
+from logging.config import dictConfig
 from sentry_sdk.integrations.flask import FlaskIntegration
+from lxml import etree
 
 from apifiles3 import write_file
 from apifiles3 import remove_taric_file
