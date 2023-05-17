@@ -18,11 +18,11 @@ ecs-logging==0.5.0        # via -r requirements.txt
 elastic-apm[flask]==5.10.0  # via -r requirements.txt
 flake8-bugbear==23.2.13   # via -r requirements-dev.in
 flake8==6.0.0             # via -r requirements-dev.in, flake8-bugbear
-flask==2.2.3              # via -r requirements.txt, sentry-sdk
+flask==2.2.5              # via -r requirements.txt, sentry-sdk
 gevent==21.8.0            # via -r requirements.txt
 greenlet==1.1.0           # via -r requirements.txt, gevent
 idna==2.10                # via -r requirements.txt, requests
-importlib-metadata==6.0.0  # via -r requirements.txt, flask
+importlib-metadata==6.6.0  # via -r requirements.txt, flask
 ipy==0.83                 # via -r requirements.txt
 isort==4.3.21             # via pylint
 itsdangerous==2.1.2       # via -r requirements.txt, flask
@@ -50,10 +50,10 @@ tomlkit==0.11.6           # via pylint
 typing-extensions==4.5.0  # via astroid, black, pylint
 urllib3==1.26.5           # via -r requirements.txt, botocore, elastic-apm, requests, sentry-sdk
 werkzeug==2.2.3           # via -r requirements.txt, flask
-wrapt==1.12.1             # via astroid
+wrapt==1.15.0             # via astroid
 zipp==3.15.0              # via -r requirements.txt, importlib-metadata
 zope.event==4.6           # via -r requirements.txt, gevent
-zope.interface==5.5.2     # via -r requirements.txt, gevent
+zope.interface==6.0       # via -r requirements.txt, gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

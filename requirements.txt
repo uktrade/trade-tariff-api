@@ -12,11 +12,11 @@ chardet==3.0.4            # via requests
 click==8.1.3              # via -r requirements.in, flask
 ecs-logging==0.5.0        # via -r requirements.in
 elastic-apm[flask]==5.10.0  # via -r requirements.in
-flask==2.2.3              # via -r requirements.in, sentry-sdk
+flask==2.2.5              # via -r requirements.in, sentry-sdk
 gevent==21.8.0            # via -r requirements.in
 greenlet==1.1.0           # via gevent
 idna==2.10                # via requests
-importlib-metadata==6.0.0  # via flask
+importlib-metadata==6.6.0  # via flask
 ipy==0.83                 # via -r requirements.in
 itsdangerous==2.1.2       # via -r requirements.in, flask
 jinja2==3.1.2             # via -r requirements.in, flask
@@ -32,7 +32,7 @@ urllib3==1.26.5           # via botocore, elastic-apm, requests, sentry-sdk
 werkzeug==2.2.3           # via -r requirements.in, flask
 zipp==3.15.0              # via importlib-metadata
 zope.event==4.6           # via gevent
-zope.interface==5.5.2     # via gevent
+zope.interface==6.0       # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
