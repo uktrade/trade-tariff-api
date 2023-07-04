@@ -130,7 +130,7 @@ docker-compose.yml and a Dockerfile allow testing a containerised version locall
 This will setup Minio for s3, a container for the tariff-api and another version, tariff-api-test that runs the tests.
 Tests are automatically run, to re-run them, restart the testing container:
 
-    docker-compose restar tariff-api-test
+    docker-compose restart tariff-api-test
     
 On making any code changes it will be desirable to rebuild the container.
 

@@ -11,4 +11,4 @@ lxml==4.9.1
 MarkupSafe==2.1.2
 Werkzeug==2.2.3
 sentry-sdk[flask]==0.19.4
-requests==2.25.0
+requests==2.31.0
