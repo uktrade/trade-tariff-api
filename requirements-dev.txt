@@ -22,7 +22,7 @@ botocore==1.20.97
     #   -r requirements.txt
     #   boto3
     #   s3transfer
-certifi==2022.12.7
+certifi==2023.7.22
     # via
     #   -r requirements.txt
     #   elastic-apm
@@ -64,10 +64,6 @@ idna==2.10
     # via
     #   -r requirements.txt
     #   requests
-importlib-metadata==6.7.0
-    # via
-    #   -r requirements.txt
-    #   flask
 ipy==0.83
     # via -r requirements.txt
 isort==4.3.21
@@ -133,17 +129,8 @@ six==1.15.0
     #   -r requirements.txt
     #   pip-tools
     #   python-dateutil
-tomli==2.0.1
-    # via
-    #   black
-    #   pylint
 tomlkit==0.11.6
     # via pylint
-typing-extensions==4.7.1
-    # via
-    #   astroid
-    #   black
-    #   pylint
 urllib3==1.26.5
     # via
     #   -r requirements.txt
@@ -157,10 +144,6 @@ werkzeug==2.2.3
     #   flask
 wrapt==1.15.0
     # via astroid
-zipp==3.15.0
-    # via
-    #   -r requirements.txt
-    #   importlib-metadata
 zope-event==4.6
     # via
     #   -r requirements.txt
