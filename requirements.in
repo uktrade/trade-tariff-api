@@ -4,7 +4,7 @@ click==8.1.3
 ecs-logging==0.5.0
 elastic-apm[flask]==5.10.0
 Flask==2.2.5
-gevent==21.8.0
+gevent==23.9.1
 IPy==0.83
 itsdangerous==2.1.2
 Jinja2==3.1.2
@@ -13,3 +13,4 @@ MarkupSafe==2.1.2
 Werkzeug==2.2.3
 sentry-sdk[flask]==0.19.4
 requests==2.31.0
+urllib3==1.26.18
