@@ -29,10 +29,10 @@ s3transfer==0.4.2         # via boto3
 sentry-sdk[flask]==0.19.4  # via -r requirements.in
 six==1.15.0               # via python-dateutil
 urllib3==1.26.18          # via -r requirements.in, botocore, elastic-apm, requests, sentry-sdk
-werkzeug==2.2.3           # via -r requirements.in, flask
-zipp==3.16.2              # via importlib-metadata
+werkzeug==3.0.1           # via -r requirements.in, flask
+zipp==3.17.0              # via importlib-metadata
 zope.event==5.0           # via gevent
-zope.interface==6.0       # via gevent
+zope.interface==6.1       # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

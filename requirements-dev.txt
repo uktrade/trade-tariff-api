@@ -47,13 +47,13 @@ sentry-sdk[flask]==0.19.4  # via -r requirements.txt
 six==1.15.0               # via -r requirements.txt, pip-tools, python-dateutil
 tomli==2.0.1              # via black, pylint
 tomlkit==0.11.6           # via pylint
-typing-extensions==4.7.1  # via astroid, black, pylint
+typing-extensions==4.8.0  # via astroid, black, pylint
 urllib3==1.26.18          # via -r requirements.txt, botocore, elastic-apm, requests, sentry-sdk
-werkzeug==2.2.3           # via -r requirements.txt, flask
+werkzeug==3.0.1           # via -r requirements.txt, flask
 wrapt==1.15.0             # via astroid
-zipp==3.16.2              # via -r requirements.txt, importlib-metadata
+zipp==3.17.0              # via -r requirements.txt, importlib-metadata
 zope.event==5.0           # via -r requirements.txt, gevent
-zope.interface==6.0       # via -r requirements.txt, gevent
+zope.interface==6.1       # via -r requirements.txt, gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
