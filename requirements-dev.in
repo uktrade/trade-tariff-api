@@ -1,6 +1,6 @@
 -r requirements.txt
 
-black==23.1.0
+black==24.3.0
 flake8==6.0.0
 flake8-bugbear==23.2.13
 pylint==2.16.3
