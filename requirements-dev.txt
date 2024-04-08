@@ -6,7 +6,7 @@
 #
 astroid==2.14.2           # via pylint
 attrs==20.3.0             # via flake8-bugbear
-black==23.1.0             # via -r requirements-dev.in
+black==24.3.0             # via -r requirements-dev.in
 blinker==1.4              # via -r requirements.txt, elastic-apm, sentry-sdk
 boto3==1.17.97            # via -r requirements.txt
 botocore==1.20.97         # via -r requirements.txt, boto3, s3transfer

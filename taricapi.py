@@ -504,9 +504,9 @@ def get_server():
     @app.after_request
     def add_x_robots(response):  # pylint: disable=W0612
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
-        response.headers[
-            "Strict-Transport-Security"
-        ] = "max-age=31536000; includeSubDomains"
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
 
         if GA_TRACKING_ID:
             gevent.spawn(
