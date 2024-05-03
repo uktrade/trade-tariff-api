@@ -8,8 +8,6 @@ from flask import Response
 from flask import has_request_context
 from flask import request
 
-# from utils import get_package_version
-
 
 class ASIMFormatter(logging.Formatter):
     def _get_event_result(self, response: Response) -> str:
@@ -48,11 +46,7 @@ class ASIMFormatter(logging.Formatter):
             "EventOriginalSeverity": record.levelname,  # duplicate of above?
             "EventSchema": "WebSession",
             "EventSchemaVersion": "0.2.6",
-            # "IpFilterVersion": get_package_version(),
         }
-
-        # TODO: look at expanding to include other fields from schema:
-        #  https://learn.microsoft.com/en-us/azure/sentinel/normalization-schema-web
 
     def get_request_dict(self, request: Request) -> dict:
         request_dict = {
@@ -67,7 +61,6 @@ class ASIMFormatter(logging.Formatter):
             "HttpRequestXff": request.headers.get("X-Forwarded-For"),
             "HttpResponseTime": "N/A",
             "HttpHost": request.host,
-            # TODO: add better support for multi-file upload and other file fields e.g. FileSize
             "FileName": self._get_file_name(request),
             "AdditionalFields": {
                 "TraceHeaders": {},
