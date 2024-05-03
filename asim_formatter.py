@@ -75,9 +75,9 @@ class ASIMFormatter(logging.Formatter):
         }
 
         for trace_header in os.environ.get("DLFA_TRACE_HEADERS", ("X-Amzn-Trace-Id",)):
-            request_dict["AdditionalFields"]["TraceHeaders"][
-                trace_header
-            ] = request.headers.get(trace_header, None)
+            request_dict["AdditionalFields"]["TraceHeaders"][trace_header] = (
+                request.headers.get(trace_header, None)
+            )
 
         return request_dict
 

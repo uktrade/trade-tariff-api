@@ -21,9 +21,10 @@ TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"asim_formatter": {
-        "()": ASIMFormatter,
-    }
+    "formatters": {
+        "asim_formatter": {
+            "()": ASIMFormatter,
+        }
     },
     "handlers": {
         "wsgi": {
