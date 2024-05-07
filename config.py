@@ -1,7 +1,7 @@
 import os
 
-from .asim_formatter import ASIMFormatter
-from .utils import strtobool, strtolist
+from asim_formatter import ASIMFormatter
+from utils import strtobool, strtolist
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 PORT = int(os.environ.get("PORT", 8080))
