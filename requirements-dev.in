@@ -3,6 +3,8 @@
 black==24.3.0
 flake8==6.0.0
 flake8-bugbear==23.2.13
-pylint==2.16.3
-pipdeptree==2.15.1
 pip-tools==5.4.0
+pipdeptree==2.15.1
+pylint==2.16.3
+pytest-playwright==0.4.4
+python-dotenv==1.0.1
