@@ -51,7 +51,7 @@ opentelemetry-semantic-conventions==0.43b0  # via opentelemetry-instrumentation-
 opentelemetry-util-http==0.43b0  # via opentelemetry-instrumentation-wsgi
 prompt-toolkit==3.0.43    # via click-repl
 protobuf==4.25.3          # via googleapis-common-protos, opentelemetry-proto
-python-dateutil==2.9.0.post0  # via botocore, celery
+python-dateutil==2.9.0.post0  # via -r requirements.in, botocore, celery
 requests==2.31.0          # via -r requirements.in, dbt-copilot-python, opentelemetry-exporter-otlp-proto-http
 s3transfer==0.4.2         # via boto3
 sentry-sdk[flask]==0.19.4  # via -r requirements.in

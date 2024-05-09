@@ -80,7 +80,7 @@ pytest==8.2.0             # via pytest-base-url, pytest-playwright
 python-dateutil==2.9.0.post0  # via -r requirements.txt, botocore, celery
 python-dotenv==1.0.1      # via -r requirements-dev.in
 python-slugify==8.0.4     # via pytest-playwright
-requests==2.31.0          # via -r requirements.txt, dbt-copilot-python, opentelemetry-exporter-otlp-proto-http
+requests==2.31.0          # via -r requirements.txt, dbt-copilot-python, opentelemetry-exporter-otlp-proto-http, pytest-base-url
 s3transfer==0.4.2         # via -r requirements.txt, boto3
 sentry-sdk[flask]==0.19.4  # via -r requirements.txt
 six==1.15.0               # via -r requirements.txt, pip-tools, python-dateutil
