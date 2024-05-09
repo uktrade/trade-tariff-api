@@ -1,5 +1,6 @@
 import os
 
+from asim_formatter import ASIMFormatter
 from utils import strtobool
 from utils import strtolist
 from dbt_copilot_python.utility import is_copilot
@@ -25,12 +26,16 @@ TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"ecs": {"()": "ecs_logging.StdlibFormatter"}},
+    "formatters": {
+        "asim_formatter": {
+            "()": ASIMFormatter,
+        }
+    },
     "handlers": {
         "wsgi": {
             "class": "logging.StreamHandler",
             "stream": "ext://flask.logging.wsgi_errors_stream",
-            "formatter": "ecs",
+            "formatter": "asim_formatter",
         }
     },
     "root": {"level": "INFO", "handlers": ["wsgi"]},
@@ -50,7 +55,6 @@ REQUIRE_AUTH_FOR_READS = strtobool(os.environ.get("REQUIRE_AUTH_FOR_READS", "tru
 
 ELASTIC_APM_URL = os.environ.get("ELASTIC_APM_URL", None)
 ELASTIC_APM_TOKEN = os.environ.get("ELASTIC_APM_TOKEN", None)
-
 
 GA_TRACKING_ID = os.environ.get("GA_TRACKING_ID", None)
 GA_ENDPOINT = os.environ.get("GA_ENDPOINT", "https://www.google-analytics.com/collect")
