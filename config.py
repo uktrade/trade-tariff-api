@@ -1,13 +1,18 @@
 import os
 
 from asim_formatter import ASIMFormatter
-from utils import strtobool, strtolist
+from utils import strtobool
+from utils import strtolist
+from dbt_copilot_python.utility import is_copilot
+
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 PORT = int(os.environ.get("PORT", 8080))
 
-AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
-AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+if not is_copilot():
+    AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+    AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+
 AWS_BUCKET_NAME = os.environ["AWS_BUCKET_NAME"]
 
 API_ROOT = os.environ.get("API_ROOT", "http://localhost:8080/api/v1/")
