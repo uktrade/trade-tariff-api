@@ -51,7 +51,9 @@ def api_request_context(
     """Generator yeilding a Playwright APIRequestContext for use when calling
     API endpoints."""
 
-    headers = {}
+    headers = {
+        "Accept": "*/*",
+    }
     if service_api_key:
         headers["X-API-KEY"] = service_api_key
 
@@ -63,26 +65,90 @@ def api_request_context(
     request_context.dispose()
 
 
+@pytest.fixture
+def envelope_file_content():
+    return (
+"""<?xml version="1.0" encoding="UTF-8"?>
+<env:envelope xmlns="urn:publicid:-:DGTAXUD:TARIC:MESSAGE:1.0" xmlns:env="urn:publicid:-:DGTAXUD:GENERAL:ENVELOPE:1.0" id="12345">
+    <env:transaction id="123">
+    </env:transaction>
+</env:envelope>"""
+    )
+
+
 def test_root_path(
-    playwright: Playwright,
-    service_base_url: str,
+    api_request_context,
 ):
     """Test that the application's root path responds correctly with a
     `200 OK` response."""
 
-    request_context = playwright.request.new_context(base_url=service_base_url)
-    response = request_context.get(url="")
+    response = api_request_context.get(url="")
+
     assert response.ok
-    request_context.dispose()
 
 
 def test_fail_with_no_api_key(
+    playwright: Playwright,
+    service_base_url: str,
+):
+    """Test that the application correctly returns a 403 response (not allowed)
+    to an endpoint that requires an API key.
+    """
+
+    request_context = playwright.request.new_context(base_url=service_base_url)
+    response = request_context.get(DELTAS_URL_PATH)
+
+    assert response.status == 403
+
+    request_context.dispose()
+
+
+def test_post_envelope(
+    api_request_context,
+    envelope_file_content,
+):
+    """Test posting a valid envelope file to the service."""
+
+
+    """
+    Info: equivalent test taken from runtests.sh
+    ---
+    test "Correct file upload -> expect 200"
+    curl -s -i
+        -H "X-API-KEY: def456"
+        -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1"
+        --form file=@tests/DIT123456.xml
+        -w "%{http_code}"
+        -o /dev/null
+        $APIURLFILE/180251?modtime=2019-02-05T12:00:00.000
+    assert "200" "$out"
+    """
+
+
+    response = api_request_context.post(
+        f"{FILES_URL_PATH}/180251",
+        params={
+            "modtime": "2019-02-05T12:00:00.000",
+        },
+        multipart={
+            "fileField": {
+                "name": "DIT123456.xml",
+                "mimeType": "application/xml",
+                "buffer": str.encode(envelope_file_content),
+            },
+        },
+    )
+
+    assert response.ok
+
+
+def test_get_deltas(
     api_request_context,
 ):
+    """Test that the application correctly returns a 403 response (not allowed)
+    to an endpoint that requires an API key.
     """
-    TODO:
 
-    test "No API KEY -> expect 403"
-    out=$(curl -s -w "%{http_code}" -o /dev/null $APIURLLIST)
-    assert "403" "$out"
-    """
+    response = api_request_context.get(DELTAS_URL_PATH)
+
+    assert response.ok
