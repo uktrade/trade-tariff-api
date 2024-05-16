@@ -83,6 +83,31 @@ def envelope_file_content():
     )
 
 
+@pytest.fixture
+def posted_envelope(
+    api_request_context,
+    envelope_file_content,
+):
+    """Post an envelope to the service. Used for tests that require an envelope to retrieve."""
+    response = api_request_context.post(
+        f"{FILES_URL_PATH}/{SEQUENCE_ID}",
+        params={
+            "modtime": MODTIME,
+        },
+        multipart={
+            "file": {
+                "name": ENVELOPE_FILE_NAME,
+                "mimeType": "application/xml",
+                "buffer": str.encode(envelope_file_content),
+            },
+        },
+    )
+    assert response.ok
+    yield
+    response = api_request_context.delete(f"{FILES_URL_PATH}/{SEQUENCE_ID}")
+    assert response.ok
+
+
 def test_root_path(
     api_request_context,
 ):
@@ -135,11 +160,10 @@ def test_post_envelope(
 
 def test_get_deltas(
     api_request_context,
+    posted_envelope,
 ):
-    """Test that the application correctly returns a 403 response (not allowed)
-    to an endpoint that requires an API key.
-    """
+    """Test getting a list of envelopes from the service."""
 
-    response = api_request_context.get(DELTAS_URL_PATH)
+    response = api_request_context.get(f"{DELTAS_URL_PATH}/{DATE}")
 
     assert response.ok
