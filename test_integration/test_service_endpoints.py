@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Generator
 
 import os
@@ -10,6 +11,11 @@ from playwright.sync_api import Playwright
 
 DELTAS_URL_PATH = "/api/v1/taricdeltas"
 FILES_URL_PATH = "/api/v1/taricfiles"
+
+SEQUENCE_ID = "180251"
+ENVELOPE_FILE_NAME = "DIT123456.xml"
+MODTIME = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+DATE = datetime.now().strftime("%Y-%m-%d")
 
 
 @pytest.fixture(scope="session")
@@ -111,13 +117,13 @@ def test_post_envelope(
     """Test posting a valid envelope file to the service."""
 
     response = api_request_context.post(
-        f"{FILES_URL_PATH}/180251",
+        f"{FILES_URL_PATH}/{SEQUENCE_ID}",
         params={
-            "modtime": "2019-02-05T12:00:00.000",
+            "modtime": MODTIME,
         },
         multipart={
             "file": {
-                "name": "DIT123456.xml",
+                "name": ENVELOPE_FILE_NAME,
                 "mimeType": "application/xml",
                 "buffer": str.encode(envelope_file_content),
             },
