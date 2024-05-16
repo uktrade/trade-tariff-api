@@ -167,3 +167,13 @@ def test_get_deltas(
     response = api_request_context.get(f"{DELTAS_URL_PATH}/{DATE}")
 
     assert response.ok
+
+
+def test_get_envelope(
+    api_request_context,
+    posted_envelope,
+):
+    """Test getting a specific envelope from the service."""
+
+    response = api_request_context.get(f"{FILES_URL_PATH}/{SEQUENCE_ID}")
+    assert response.ok
