@@ -5,9 +5,7 @@ import pytest
 
 from dotenv import load_dotenv
 from playwright.sync_api import APIRequestContext
-from playwright.sync_api import expect
 from playwright.sync_api import Playwright
-from playwright.sync_api import Page
 
 
 DELTAS_URL_PATH = "/api/v1/taricdeltas"
@@ -68,11 +66,14 @@ def api_request_context(
 @pytest.fixture
 def envelope_file_content():
     return (
-"""<?xml version="1.0" encoding="UTF-8"?>
-<env:envelope xmlns="urn:publicid:-:DGTAXUD:TARIC:MESSAGE:1.0" xmlns:env="urn:publicid:-:DGTAXUD:GENERAL:ENVELOPE:1.0" id="12345">
-    <env:transaction id="123">
-    </env:transaction>
-</env:envelope>"""
+        """<?xml version="1.0" encoding="UTF-8"?>
+        <env:envelope
+          xmlns="urn:publicid:-:DGTAXUD:TARIC:MESSAGE:1.0"
+          xmlns:env="urn:publicid:-:DGTAXUD:GENERAL:ENVELOPE:1.0"
+          id="12345"
+        >
+        <env:transaction id="123"></env:transaction>
+        </env:envelope>"""
     )
 
 
@@ -108,22 +109,6 @@ def test_post_envelope(
     envelope_file_content,
 ):
     """Test posting a valid envelope file to the service."""
-
-
-    """
-    Info: equivalent test taken from runtests.sh
-    ---
-    test "Correct file upload -> expect 200"
-    curl -s -i
-        -H "X-API-KEY: def456"
-        -H "X-Forwarded-For: 1.2.3.4, 127.0.0.1"
-        --form file=@tests/DIT123456.xml
-        -w "%{http_code}"
-        -o /dev/null
-        $APIURLFILE/180251?modtime=2019-02-05T12:00:00.000
-    assert "200" "$out"
-    """
-
 
     response = api_request_context.post(
         f"{FILES_URL_PATH}/180251",
