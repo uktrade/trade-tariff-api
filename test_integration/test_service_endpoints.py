@@ -70,7 +70,8 @@ def api_request_context(
 
 
 @pytest.fixture
-def envelope_file_content():
+def envelope_file_content() -> str:
+    """Return the contents of a valid envelope file."""
     return (
         """<?xml version="1.0" encoding="UTF-8"?>
         <env:envelope
@@ -85,9 +86,9 @@ def envelope_file_content():
 
 @pytest.fixture
 def posted_envelope(
-    api_request_context,
-    envelope_file_content,
-):
+    api_request_context: APIRequestContext,
+    envelope_file_content: str,
+) -> Generator[None, None, None]:
     """Post an envelope to the service. Used for tests that require an envelope to retrieve."""
     response = api_request_context.post(
         f"{FILES_URL_PATH}/{SEQUENCE_ID}",
@@ -109,7 +110,7 @@ def posted_envelope(
 
 
 def test_root_path(
-    api_request_context,
+    api_request_context: APIRequestContext,
 ):
     """Test that the application's root path responds correctly with a
     `200 OK` response."""
@@ -136,8 +137,8 @@ def test_fail_with_no_api_key(
 
 
 def test_post_envelope(
-    api_request_context,
-    envelope_file_content,
+    api_request_context: APIRequestContext,
+    envelope_file_content: str,
 ):
     """Test posting a valid envelope file to the service."""
 
@@ -159,8 +160,8 @@ def test_post_envelope(
 
 
 def test_get_deltas(
-    api_request_context,
-    posted_envelope,
+    api_request_context: APIRequestContext,
+    posted_envelope: None,
 ):
     """Test getting a list of envelopes from the service."""
 
@@ -170,8 +171,8 @@ def test_get_deltas(
 
 
 def test_get_envelope(
-    api_request_context,
-    posted_envelope,
+    api_request_context: APIRequestContext,
+    posted_envelope: None,
 ):
     """Test getting a specific envelope from the service."""
 
