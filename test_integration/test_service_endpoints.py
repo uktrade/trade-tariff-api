@@ -116,7 +116,7 @@ def test_post_envelope(
             "modtime": "2019-02-05T12:00:00.000",
         },
         multipart={
-            "fileField": {
+            "file": {
                 "name": "DIT123456.xml",
                 "mimeType": "application/xml",
                 "buffer": str.encode(envelope_file_content),
