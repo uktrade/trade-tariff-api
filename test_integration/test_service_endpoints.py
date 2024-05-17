@@ -12,7 +12,7 @@ from playwright.sync_api import Playwright
 DELTAS_URL_PATH = "/api/v1/taricdeltas"
 FILES_URL_PATH = "/api/v1/taricfiles"
 
-SEQUENCE_ID = "180251"
+SEQUENCE_ID = 180251
 ENVELOPE_FILE_NAME = "DIT123456.xml"
 MODTIME = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 DATE = datetime.now().strftime("%Y-%m-%d")
@@ -72,8 +72,7 @@ def api_request_context(
 @pytest.fixture
 def envelope_file_content() -> str:
     """Return the contents of a valid envelope file."""
-    return (
-        """<?xml version="1.0" encoding="UTF-8"?>
+    return """<?xml version="1.0" encoding="UTF-8"?>
         <env:envelope
           xmlns="urn:publicid:-:DGTAXUD:TARIC:MESSAGE:1.0"
           xmlns:env="urn:publicid:-:DGTAXUD:GENERAL:ENVELOPE:1.0"
@@ -81,7 +80,6 @@ def envelope_file_content() -> str:
         >
         <env:transaction id="123"></env:transaction>
         </env:envelope>"""
-    )
 
 
 @pytest.fixture
@@ -166,15 +164,21 @@ def test_get_deltas(
     """Test getting a list of envelopes from the service."""
 
     response = api_request_context.get(f"{DELTAS_URL_PATH}/{DATE}")
-
     assert response.ok
+
+    deltas = response.json()
+    assert deltas[0]["id"] == SEQUENCE_ID
+    assert deltas[0]["issue_date"] == MODTIME
 
 
 def test_get_envelope(
     api_request_context: APIRequestContext,
     posted_envelope: None,
+    envelope_file_content: str,
 ):
     """Test getting a specific envelope from the service."""
 
     response = api_request_context.get(f"{FILES_URL_PATH}/{SEQUENCE_ID}")
     assert response.ok
+
+    assert response.body() == str.encode(envelope_file_content)
