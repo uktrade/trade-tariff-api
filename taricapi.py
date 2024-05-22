@@ -551,7 +551,6 @@ def serve():
     gevent.signal_handler(signal.SIGTERM, server.stop)
     gevent.signal_handler(signal.SIGTERM, server.stop)
 
-    1 / 0
     server.serve_forever()
     gevent.get_hub().join()
 
