@@ -9,8 +9,9 @@ from playwright.sync_api import APIRequestContext
 from playwright.sync_api import Playwright
 
 
-DELTAS_URL_PATH = "/api/v1/taricdeltas"
-FILES_URL_PATH = "/api/v1/taricfiles"
+API_V1_PATH = "/api/v1"
+DELTAS_URL_PATH = f"{API_V1_PATH}/taricdeltas"
+FILES_URL_PATH = f"{API_V1_PATH}/taricfiles"
 
 SEQUENCE_ID = 180251
 ENVELOPE_FILE_NAME = "DIT123456.xml"
@@ -24,9 +25,9 @@ def init_from_dotenv() -> None:
     Load config variables from a `.env` file into environment variables for use
     by fixtures and tests.
 
-    The `.env` may be located in this module's directory or higher up the
-    application's directory hierarchy.
+    The `.env` should be located in this module's directory.
     """
+
     assert load_dotenv()
 
 
@@ -53,7 +54,8 @@ def api_request_context(
     service_base_url: str,
 ) -> Generator[APIRequestContext, None, None]:
     """Generator yeilding a Playwright APIRequestContext for use when calling
-    API endpoints."""
+    API endpoints. The returned APIRequestContext is disposed of during fixture
+    teardown."""
 
     headers = {
         "Accept": "*/*",
@@ -72,6 +74,7 @@ def api_request_context(
 @pytest.fixture
 def envelope_file_content() -> str:
     """Return the contents of a valid envelope file."""
+
     return """<?xml version="1.0" encoding="UTF-8"?>
         <env:envelope
           xmlns="urn:publicid:-:DGTAXUD:TARIC:MESSAGE:1.0"
@@ -87,7 +90,10 @@ def posted_envelope(
     api_request_context: APIRequestContext,
     envelope_file_content: str,
 ) -> Generator[None, None, None]:
-    """Post an envelope to the service. Used for tests that require an envelope to retrieve."""
+    """Post an envelope to the service. Used for tests that require an envelope
+    to retrieve. The envelope is deleted (via the API) during fixture
+    teardown."""
+
     response = api_request_context.post(
         f"{FILES_URL_PATH}/{SEQUENCE_ID}",
         params={
@@ -123,8 +129,7 @@ def test_fail_with_no_api_key(
     service_base_url: str,
 ):
     """Test that the application correctly returns a 403 response (not allowed)
-    to an endpoint that requires an API key.
-    """
+    to an endpoint that requires an API key."""
 
     request_context = playwright.request.new_context(base_url=service_base_url)
     response = request_context.get(DELTAS_URL_PATH)
