@@ -448,10 +448,13 @@ def taricfiles_upload(seq):
 
     # file is that attached in the POST request
     file = request.files["file"]
-
-    if not file or file.filename == "":
-        logger.debug("No file uploaded")
+    if not file:
+        logger.debug("No file provided")
         return Response("400 No file uploaded", status=400)
+
+    if file.filename == "":
+        logger.debug("No filename")
+        return Response("400 No filename", status=400)
 
     logger.debug("file uploaded is %s", file.filename)
 
