@@ -40,7 +40,7 @@ def generate_keys(api_key: str=None) -> tuple[str, str]:
 
 @click.group(invoke_without_command=True)
 @click.pass_context
-@click.option("--api_key", required=False, help="Provide a key a hashing.")
+@click.option("--api_key", required=False, help="Provide a key for hashing.")
 def cli(ctx, api_key):
     """Generate and print an API key and its hash."""
 
