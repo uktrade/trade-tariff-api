@@ -18,7 +18,7 @@ def print_keys(api_key, hashed_api_key) -> None:
     click.echo()
 
 
-def generate_keys(api_key: str=None) -> tuple[str, str]:
+def generate_keys(api_key: str = None) -> tuple[str, str]:
     """Generate an API key and its hash, returning both in that order within a
     tuple. If `api_key` is provided (it must be a hex value in string format)
     then its value is used as the API key from which the hash is generated."""
