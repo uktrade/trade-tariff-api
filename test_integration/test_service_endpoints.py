@@ -4,7 +4,8 @@ from typing import Generator
 import os
 import pytest
 
-from dotenv import load_dotenv
+from dotenv import find_dotenv
+from dotenv.main import DotEnv
 from playwright.sync_api import APIRequestContext
 from playwright.sync_api import Playwright
 
@@ -20,7 +21,7 @@ DATE = datetime.now().strftime("%Y-%m-%d")
 
 
 @pytest.fixture(scope="session")
-def init_from_dotenv() -> None:
+def init_from_dotenv(pytestconfig) -> None:
     """
     Load config variables from a `.env` file into environment variables for use
     by fixtures and tests.
@@ -28,7 +29,14 @@ def init_from_dotenv() -> None:
     The `.env` should be located in this module's directory.
     """
 
-    assert load_dotenv()
+    env_filename = pytestconfig.getoption("--env-file")
+    dotenv_path = find_dotenv(filename=env_filename)
+
+    assert dotenv_path
+
+    dotenv = DotEnv(dotenv_path=dotenv_path)
+
+    assert dotenv.set_as_environment_variables()
 
 
 @pytest.fixture(scope="session")
