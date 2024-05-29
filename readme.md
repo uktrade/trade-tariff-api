@@ -155,6 +155,23 @@ against staging (replace `<api_key> with appropropriate values from the secrets 
     curl -H "X-API-KEY: <api_key>" -X POST https://tariffs-api-staging.london.cloudapps.digital/api/v1/rebuildindex
 
 
+# Integration testing
+
+Integration tests may be executed against services instance by creating and
+configuring a `.env` file in the `/test_integration` directory and then
+executing them via pytest:
+
+    pytest --env-file=.env test_integration
+
+See the file `/test_integration/example.env` for an example `.env` file.
+Multiple `.env` files may be configured in this way to allow pointing at
+different `.env` files, each containing settings for its specific service
+instance.
+
+Note that because tests may have enduring side-effects (if one of the tests
+fails), they probably shouldn't be run against a production service.
+
+
 # Further detail
 
 The complete API specification is documented and available in separate word documentation.

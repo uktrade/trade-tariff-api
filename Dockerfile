@@ -10,14 +10,14 @@ RUN \
 # Create app directory
 WORKDIR /app
 
-# Install app dependencies
+# Install Python package dependencies.
+COPY requirements*.txt /app/
+RUN pip install --upgrade pip setuptools
+RUN pip install -r requirements.txt --no-warn-script-location
+
+# Copy app source code.
 COPY . /app
 
-RUN pip install \
-    -U pip setuptools \
-    -r requirements.txt
-
 EXPOSE 8080
-
 CMD /bin/s -c source docker-helpers/whitelist-host-ips \
     python taricapi.py
