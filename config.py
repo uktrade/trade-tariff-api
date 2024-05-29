@@ -23,6 +23,8 @@ APIKEYS_UPLOAD = strtolist(os.environ.get("APIKEYS_UPLOAD"))
 TARIC_FILES_FOLDER = os.environ.get("TARIC_FILES_FOLDER", "taricfiles")
 TARIC_FILES_INDEX = os.environ.get("TARIC_FILES_INDEX", "taricdeltas.json")
 
+TARICAPI_LOG_LEVEL = os.environ.get("TARICAPI_LOG_LEVEL", "INFO")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -39,7 +41,7 @@ LOGGING = {
         }
     },
     "root": {"level": "INFO", "handlers": ["wsgi"]},
-    "taricapi": {"level": "INFO", "handlers": ["wsgi"]},
+    "taricapi": {"level": TARICAPI_LOG_LEVEL, "handlers": ["wsgi"]},
     "flask": {"level": "INFO", "handlers": ["wsgi"]},
 }
 
