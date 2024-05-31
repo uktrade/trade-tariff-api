@@ -7,11 +7,11 @@ echo "We are downloading copilot"
 result=$(python <<EOF
 version="1.33.3"
 import subprocess
-subprocess.run(
+subprocess.check_output(
     f"wget -q -O copilot-{version} https://ecs-cli-v2-release.s3.amazonaws.com/copilot-linux-v{version} && "
     f"chmod +x ./copilot-{version} && mv copilot-{version} /copilot",
     shell=True,
-    capture_output=True,
+    stderr=subprocess.STDOUT,
     )
 EOF
 )
