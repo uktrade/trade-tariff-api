@@ -15,13 +15,12 @@ class ASIMFormatter(logging.Formatter):
 
         return event_result
 
-    def _get_file_name(self, request: Request) -> str:
-        if not request.files:
-            return "N/A"
-        if len(request.files.keys()) == 1:
-            return list(request.files.keys())[0]
+    def _get_file_name(self, response: Response) -> str:
+        content_disposition = response.headers.get("Content-Disposition")
+        if content_disposition:
+            return content_disposition.split("filename=")[-1].strip('"')
 
-        return ";".join(list(request.files.keys())[0])
+        return "N/A"
 
     def _get_event_severity(self, log_level: str) -> str:
         event_map = {
@@ -61,7 +60,6 @@ class ASIMFormatter(logging.Formatter):
             "HttpRequestXff": request.headers.get("X-Forwarded-For"),
             "HttpResponseTime": "N/A",
             "HttpHost": request.host,
-            "FileName": self._get_file_name(request),
             "AdditionalFields": {
                 "TraceHeaders": {},
             },
@@ -78,6 +76,7 @@ class ASIMFormatter(logging.Formatter):
         return {
             "EventResult": self._get_event_result(response),
             "EventResultDetails": response.status_code,
+            "FileName": self._get_file_name(response),
             "HttpStatusCode": response.status_code,
         }
 
