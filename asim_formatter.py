@@ -52,7 +52,7 @@ class ASIMFormatter(logging.Formatter):
             "EventEndTime": log_time,
             "EventType": "HTTPsession",
             "EventSeverity": self._get_event_severity(record.levelname),
-            "EventOriginalSeverity": record.levelname,  # duplicate of above?
+            "EventOriginalSeverity": record.levelname,
             "EventSchema": "WebSession",
             "EventSchemaVersion": "0.2.6",
         }

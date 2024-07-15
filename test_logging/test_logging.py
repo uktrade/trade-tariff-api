@@ -31,7 +31,7 @@ def test_asim_formatter_get_log_dict():
         "EventEndTime": log_time,
         "EventType": "HTTPsession",
         "EventSeverity": "Informational",
-        "EventOriginalSeverity": log_record.levelname,  # duplicate of above?
+        "EventOriginalSeverity": log_record.levelname,
         "EventSchema": "WebSession",
         "EventSchemaVersion": "0.2.6",
     }
@@ -129,7 +129,7 @@ def test_asim_formatter_format():
                 "EventEndTime": log_time,
                 "EventType": "HTTPsession",
                 "EventSeverity": "Informational",
-                "EventOriginalSeverity": log_record.levelname,  # duplicate of above?
+                "EventOriginalSeverity": log_record.levelname,
                 "EventSchema": "WebSession",
                 "EventSchemaVersion": "0.2.6",
                 "Url": request.url,
