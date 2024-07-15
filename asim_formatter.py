@@ -18,7 +18,11 @@ class ASIMFormatter(logging.Formatter):
     def _get_file_name(self, response: Response) -> str:
         content_disposition = response.headers.get("Content-Disposition")
         if content_disposition:
-            return content_disposition.split("filename=")[-1].strip('"')
+            search_result = re.search("filename=(.*)[;]", content_disposition)
+            if search_result:
+                return search_result.group(1)
+            else:
+                return "N/A"
 
         return "N/A"
 
