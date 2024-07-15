@@ -1,8 +1,8 @@
 import json
 import logging
 import os
+import re
 from datetime import datetime
-
 from flask import Request
 from flask import Response
 from flask import has_request_context
@@ -18,13 +18,19 @@ class ASIMFormatter(logging.Formatter):
     def _get_file_name(self, response: Response) -> str:
         content_disposition = response.headers.get("Content-Disposition")
         if content_disposition:
-            search_result = re.search("filename=(.*)[;]", content_disposition)
-            if search_result:
-                return search_result.group(1)
-            else:
-                return "N/A"
+            return self._get_file_name_from_content_disposition(content_disposition)
+        else:
+            return "N/A"
 
-        return "N/A"
+    @staticmethod
+    def _get_file_name_from_content_disposition(content_disposition):
+        """Get the file name from the content disposition header.
+        Uses a regex string to match filenames both enclosed or not enclosed in quotes"""
+        search_result = re.search(r"""filename="?([^";\s]+)"?""", content_disposition)
+        if search_result:
+            return search_result.group(1)
+        else:
+            return "N/A"
 
     def _get_event_severity(self, log_level: str) -> str:
         event_map = {

@@ -1,6 +1,8 @@
 import json
 import logging
 from datetime import datetime
+
+import pytest
 from flask import request, Flask, Response
 
 from asim_formatter import ASIMFormatter
@@ -39,15 +41,15 @@ def test_asim_formatter_get_request_dict():
     """Test that get_request_dict returns a correctly formatted dictionary of request data"""
     app = Flask(__name__)
     with app.test_request_context(
-        method="GET",
-        path="/example_route",
-        query_string="param1=value1&param2=value2",
-        headers={
-            "Content-Type": "application/json",
-            "X-Forwarded-For": "1.1.1.1",
-            "X-Amzn-Trace-Id": "123testid",
-        },
-        data='{"key": "value"}',
+            method="GET",
+            path="/example_route",
+            query_string="param1=value1&param2=value2",
+            headers={
+                "Content-Type": "application/json",
+                "X-Forwarded-For": "1.1.1.1",
+                "X-Amzn-Trace-Id": "123testid",
+            },
+            data='{"key": "value"}',
     ):
         request_dict = ASIMFormatter().get_request_dict(request)
 
@@ -76,7 +78,7 @@ def test_asim_formatter_get_response_dict():
         status=200,
         headers={
             "Content-Type": "application/json",
-            "Content-Disposition": "attachment; filename=dummy.rtf",
+            "Content-Disposition": "attachment; filename=dummy.rtf;",
         },
         response='{"key": "value"}',
     )
@@ -112,11 +114,11 @@ def test_asim_formatter_format():
     log_time = datetime.utcfromtimestamp(log_record.created).isoformat()
 
     with app.test_request_context(
-        method="GET",
-        path="/example_route",
-        query_string="param1=value1&param2=value2",
-        headers={"Content-Type": "application/json", "X-Forwarded-For": "1.1.1.1"},
-        data='{"key": "value"}',
+            method="GET",
+            path="/example_route",
+            query_string="param1=value1&param2=value2",
+            headers={"Content-Type": "application/json", "X-Forwarded-For": "1.1.1.1"},
+            data='{"key": "value"}',
     ):
         formatted_log = ASIMFormatter().format(log_record)
         assert formatted_log == json.dumps(
@@ -150,3 +152,18 @@ def test_asim_formatter_format():
                 "HttpStatusCode": response.status_code,
             }
         )
+
+
+@pytest.mark.parametrize("content_disposition, expected_file_name",
+                         [('attachment; filename=example.txt', 'example.txt'),
+                          ('inline; filename="example.txt"', 'example.txt'),
+                          ('attachment; filename="example@file#123.txt"', 'example@file#123.txt'),
+                          ('attachment; filename="example.txt" creation-date="Wed, 12 Feb 1997 16:29:51 -0500"',
+                           'example.txt'),
+                          ('attachment; filename=example.txt creation-date="Wed, 12 Feb 1997 16:29:51 -0500"',
+                           'example.txt'),
+                          ('attachment; filename=example.txt; creation-date="Wed, 12 Feb 1997 16:29:51 -0500"',
+                           'example.txt')])
+def test_get_file_name_from_content_disposition(content_disposition, expected_file_name):
+    file_name = ASIMFormatter()._get_file_name_from_content_disposition(content_disposition)
+    assert file_name == expected_file_name
