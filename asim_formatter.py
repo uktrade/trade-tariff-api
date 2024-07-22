@@ -25,7 +25,8 @@ class ASIMFormatter(logging.Formatter):
     @staticmethod
     def _get_file_name_from_content_disposition(content_disposition):
         """Get the file name from the content disposition header.
-        Uses a regex string to match filenames both enclosed or not enclosed in quotes"""
+        Uses a regex string to match filenames both enclosed or not enclosed in quotes
+        """
         search_result = re.search(r"""filename="?([^";\s]+)"?""", content_disposition)
         if search_result:
             return search_result.group(1)
