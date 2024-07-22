@@ -180,8 +180,13 @@ def test_get_deltas(
     assert response.ok
 
     deltas = response.json()
-    assert deltas[0]["id"] == SEQUENCE_ID
-    assert deltas[0]["issue_date"] == MODTIME
+    file_count = len(deltas) if deltas else 0
+
+    # If files were recently loaded onto the service, then the fixture file may
+    # not be the only one returned, but it should be the last one.
+    assert file_count > 0
+    assert deltas[file_count - 1]["id"] == SEQUENCE_ID
+    assert deltas[file_count - 1]["issue_date"] == MODTIME
 
 
 def test_get_envelope(
