@@ -1,8 +1,8 @@
 import json
 import logging
 import os
+import re
 from datetime import datetime
-
 from flask import Request
 from flask import Response
 from flask import has_request_context
@@ -15,13 +15,23 @@ class ASIMFormatter(logging.Formatter):
 
         return event_result
 
-    def _get_file_name(self, request: Request) -> str:
-        if not request.files:
+    def _get_file_name(self, response: Response) -> str:
+        content_disposition = response.headers.get("Content-Disposition")
+        if content_disposition:
+            return self._get_file_name_from_content_disposition(content_disposition)
+        else:
             return "N/A"
-        if len(request.files.keys()) == 1:
-            return list(request.files.keys())[0]
 
-        return ";".join(list(request.files.keys())[0])
+    @staticmethod
+    def _get_file_name_from_content_disposition(content_disposition):
+        """Get the file name from the content disposition header.
+        Uses a regex string to match filenames both enclosed or not enclosed in quotes
+        """
+        search_result = re.search(r"""filename="?([^";\s]+)"?""", content_disposition)
+        if search_result:
+            return search_result.group(1)
+        else:
+            return "N/A"
 
     def _get_event_severity(self, log_level: str) -> str:
         event_map = {
@@ -43,7 +53,7 @@ class ASIMFormatter(logging.Formatter):
             "EventEndTime": log_time,
             "EventType": "HTTPsession",
             "EventSeverity": self._get_event_severity(record.levelname),
-            "EventOriginalSeverity": record.levelname,  # duplicate of above?
+            "EventOriginalSeverity": record.levelname,
             "EventSchema": "WebSession",
             "EventSchemaVersion": "0.2.6",
         }
@@ -61,7 +71,6 @@ class ASIMFormatter(logging.Formatter):
             "HttpRequestXff": request.headers.get("X-Forwarded-For"),
             "HttpResponseTime": "N/A",
             "HttpHost": request.host,
-            "FileName": self._get_file_name(request),
             "AdditionalFields": {
                 "TraceHeaders": {},
             },
@@ -78,6 +87,7 @@ class ASIMFormatter(logging.Formatter):
         return {
             "EventResult": self._get_event_result(response),
             "EventResultDetails": response.status_code,
+            "FileName": self._get_file_name(response),
             "HttpStatusCode": response.status_code,
         }
 
