@@ -30,13 +30,13 @@ def modification_date(filepath):
     return datetime.fromtimestamp(t).isoformat()
 
 
-def md5(filepath):
-    hash_md5 = hashlib.md5()
+def sha512(filepath):
+    hash_sha512 = hashlib.sha512()
     with open(filepath, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
+            hash_sha512.update(chunk)
 
-    return hash_md5.hexdigest()
+    return hash_sha512.hexdigest()
 
 
 def file_exists(prefix, file):
