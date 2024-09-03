@@ -48,6 +48,8 @@ from config import (
     NUM_PROXIES,
     REQUIRE_AUTH_FOR_READS,
     SENTRY_DSN,
+    SENTRY_ENABLE_TRACING,
+    SENTRY_TRACES_SAMPLE_RATE,
     ELASTIC_APM_TOKEN,
     ELASTIC_APM_URL,
     ENVIRONMENT,
@@ -502,6 +504,8 @@ def get_server():
         sentry_sdk.init(
             dsn=SENTRY_DSN,
             integrations=[FlaskIntegration()],
+            enable_tracing=SENTRY_ENABLE_TRACING,
+            traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
         )
 
     @app.after_request
