@@ -11,7 +11,7 @@ blinker==1.4              # via elastic-apm, sentry-sdk
 boto3==1.17.97            # via -r requirements.in
 botocore==1.20.97         # via boto3, s3transfer
 celery==5.4.0             # via dbt-copilot-python
-certifi==2023.7.22        # via -r requirements.in, elastic-apm, requests, sentry-sdk
+certifi==2024.8.30        # via -r requirements.in, elastic-apm, requests, sentry-sdk
 charset-normalizer==3.1.0  # via requests
 click-didyoumean==0.3.1   # via celery
 click-plugins==1.1.1      # via celery
@@ -63,7 +63,7 @@ vine==5.1.0               # via amqp, celery, kombu
 wcwidth==0.2.13           # via prompt-toolkit
 werkzeug==3.0.3           # via -r requirements.in, flask
 wrapt==1.16.0             # via deprecated, opentelemetry-instrumentation
-zipp==3.17.0              # via importlib-metadata
+zipp==3.19.1              # via -r requirements.in, importlib-metadata
 zope.event==5.0           # via gevent
 zope.interface==6.1       # via gevent
 
