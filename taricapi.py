@@ -49,6 +49,7 @@ from config import (
     REQUIRE_AUTH_FOR_READS,
     SENTRY_DSN,
     SENTRY_ENABLE_TRACING,
+    SENTRY_ENVIRONMENT,
     SENTRY_TRACES_SAMPLE_RATE,
     ELASTIC_APM_TOKEN,
     ELASTIC_APM_URL,
@@ -505,6 +506,7 @@ def get_server():
             dsn=SENTRY_DSN,
             integrations=[FlaskIntegration()],
             enable_tracing=SENTRY_ENABLE_TRACING,
+            environment=SENTRY_ENVIRONMENT,
             traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
         )
 
