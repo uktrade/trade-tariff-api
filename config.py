@@ -54,6 +54,7 @@ NUM_PROXIES = int(os.environ.get("NUM_PROXIES", 0))
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
 SENTRY_ENABLE_TRACING = as_bool(os.getenv("SENTRY_ENABLE_TRACING", False))
 SENTRY_TRACES_SAMPLE_RATE = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", 0.0))
+SENTRY_ENVIRONMENT = os.environ.get("SENTRY_ENVIRONMENT")
 
 REQUIRE_AUTH_FOR_READS = as_bool(os.environ.get("REQUIRE_AUTH_FOR_READS", "true"))
 
