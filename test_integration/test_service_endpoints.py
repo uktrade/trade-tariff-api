@@ -1,4 +1,5 @@
 from datetime import datetime
+from hashlib import sha512
 from typing import Generator
 
 import os
@@ -173,6 +174,7 @@ def test_post_envelope(
 def test_get_deltas(
     api_request_context: APIRequestContext,
     posted_envelope: None,
+    envelope_file_content: str,
 ):
     """Test getting a list of envelopes from the service."""
 
@@ -187,6 +189,10 @@ def test_get_deltas(
     assert file_count > 0
     assert deltas[file_count - 1]["id"] == SEQUENCE_ID
     assert deltas[file_count - 1]["issue_date"] == MODTIME
+    assert (
+        deltas[file_count - 1]["sha512"]
+        == sha512(envelope_file_content.encode("utf-8")).hexdigest()
+    )
 
 
 def test_get_envelope(

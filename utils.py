@@ -1,14 +1,17 @@
 from typing import List, Optional, Union
 
 
-def strtobool(text: Union[str, bool]):
-    if text is True or text is False:
-        return text
+def as_bool(value: Union[str, bool]) -> bool:
+    """
+    Get the boolean value represented by the truthy `value`.
 
-    if text.lower() in ["y", "yes", "on", "true", "1"]:
-        return True
+    :param value str: The value to check
+    :rtype: bool
+    """
+    if not value:
+        return False
 
-    return False
+    return str(value).lower() in ["y", "yes", "on", "t", "true", "1"]
 
 
 def strtolist(text: Optional[str]) -> List[str]:

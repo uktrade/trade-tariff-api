@@ -37,7 +37,7 @@ from apifiles3 import get_file_list
 from apifiles3 import get_file_size
 from apifiles3 import read_file
 from apifiles3 import file_exists
-from apifiles3 import md5
+from apifiles3 import sha512
 from apifiles3 import modification_date
 from config import (
     API_ROOT,
@@ -48,6 +48,9 @@ from config import (
     NUM_PROXIES,
     REQUIRE_AUTH_FOR_READS,
     SENTRY_DSN,
+    SENTRY_ENABLE_TRACING,
+    SENTRY_ENVIRONMENT,
+    SENTRY_TRACES_SAMPLE_RATE,
     ELASTIC_APM_TOKEN,
     ELASTIC_APM_URL,
     ENVIRONMENT,
@@ -169,7 +172,7 @@ def create_index_entry(seq):
         "id": int(seq),
         "issue_date": modification_date(get_taric_filepath(seq)),
         "url": API_ROOT + "taricfiles/" + seq,
-        "md5": md5(get_taric_filepath(seq)),
+        "sha512": sha512(get_taric_filepath(seq)),
         "size": get_file_size(get_taric_filepath(seq)),
     }
     return index_entry
@@ -502,6 +505,9 @@ def get_server():
         sentry_sdk.init(
             dsn=SENTRY_DSN,
             integrations=[FlaskIntegration()],
+            enable_tracing=SENTRY_ENABLE_TRACING,
+            environment=SENTRY_ENVIRONMENT,
+            traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
         )
 
     @app.after_request
