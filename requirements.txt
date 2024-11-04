@@ -61,7 +61,7 @@ tzdata==2024.1            # via celery
 urllib3==1.26.19          # via -r requirements.in, botocore, elastic-apm, requests, sentry-sdk
 vine==5.1.0               # via amqp, celery, kombu
 wcwidth==0.2.13           # via prompt-toolkit
-werkzeug==3.0.3           # via -r requirements.in, flask
+werkzeug==3.0.6           # via -r requirements.in, flask
 wrapt==1.16.0             # via deprecated, opentelemetry-instrumentation
 zipp==3.17.0              # via importlib-metadata
 zope.event==5.0           # via gevent
