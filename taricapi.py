@@ -419,7 +419,8 @@ def taricfiles_delete(seq):
     try:
         remove_taric_file(seq)
     except ClientError as e:
-        return Response("400 Error %s" % e["Error"]["Code"], status=200)
+        logger.error(repr(e))
+        return Response("400 Error - client error", status=200)
 
     logger.debug("Starting thread to rebuild index.")
     threading.Thread(target=rebuild_index, args=[True]).start()
