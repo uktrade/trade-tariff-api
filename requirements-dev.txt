@@ -39,7 +39,7 @@ iniconfig==2.0.0          # via pytest
 ipy==0.83                 # via -r requirements.txt
 isort==4.3.21             # via pylint
 itsdangerous==2.1.2       # via -r requirements.txt, flask
-jinja2==3.1.4             # via -r requirements.txt, flask
+jinja2==3.1.5             # via -r requirements.txt, flask
 jmespath==0.10.0          # via -r requirements.txt, boto3, botocore
 kombu==5.3.7              # via -r requirements.txt, celery
 lazy-object-proxy==1.4.3  # via astroid
