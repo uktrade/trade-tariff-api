@@ -4,14 +4,15 @@ services:
     image: minio/minio
     restart: always
     ports:
-      - "9004:9004"
+      - "127.0.0.1:9004:9004"
+      - "127.0.0.1:9994:9994"
     volumes:
       - tariff-api-s3-volume:/data
     environment:
       MINIO_ACCESS_KEY: "minio_access_key"
       MINIO_SECRET_KEY: "minio_secret_key"
     entrypoint: sh
-    command: -c "mkdir -p /data/tariff-api-bucket && minio server --quiet --address 0.0.0.0:9004 /data"
+    command: -c "mkdir -p /data/tariff-api-bucket && minio server --quiet --address :9004 --console-address :9994 /data"
 
   tariff-api:
     build: .
